@@ -18,6 +18,7 @@ import {
   Notebook,
   Phone,
   Plant,
+  DeskPhoto,
 } from './Props'
 import { Dust } from './Dust'
 
@@ -123,7 +124,8 @@ function DeskWorld({ quality }: { quality: QualitySettings }) {
         <Plant position={[-0.85, 0.75, -0.32]} quality={quality} />
         <Books position={[0.95, 0.75, 0.1]} shadow={shadow} />
         <Notebook position={[0.34, 0.75, 0.37]} shadow={shadow} />
-        <Phone position={[-0.58, 0.755, 0.3]} quality={quality} />
+        <Phone position={[-0.46, 0.755, 0.34]} quality={quality} />
+        <DeskPhoto position={[-1.02, 0.75, 0.4]} shadow={shadow} />
         <ArchModel position={[-0.72, 0.75, 0.05]} shadow={shadow} />
         {quality.dust > 0 && <Dust count={quality.dust} />}
       </group>

@@ -1,6 +1,5 @@
 import { useLanguage } from '../../i18n/LanguageContext'
 import { registerSection } from '../sections'
-import avatar from '../../assets/avatar.jpg'
 
 export function About() {
   const { cv } = useLanguage()
@@ -18,9 +17,6 @@ export function About() {
           ))}
         </div>
         <div className="about-stats">
-          <div className="about-avatar rv">
-            <img src={avatar} alt={cv.meta.name} loading="lazy" />
-          </div>
           {cv.about.stats.map((s, i) => (
             <div className="stat rv" key={i} style={{ transitionDelay: `${i * 70}ms` }}>
               <span className="stat-value">{s.value}</span>

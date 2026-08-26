@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { invalidate, useFrame } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { palette } from '../theme'
@@ -7,6 +7,7 @@ import type { QualitySettings } from '../quality'
 import { scrollEngine } from '../scroll/engine'
 import { BEATS, span, smoothstep } from '../scroll/choreography'
 import { mats } from './materials'
+import avatarUrl from '../assets/avatar.jpg'
 
 /* ------------------------------------------------------------------ */
 /* Desk                                                                */
@@ -297,6 +298,52 @@ export function Phone(props: { position: [number, number, number]; quality: Qual
       <mesh position={[0, 0.0045, 0]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[0.06, 0.128]} />
         <meshStandardMaterial ref={screen} color="#0c1016" emissive="#7fb4e8" emissiveIntensity={0.08} roughness={0.2} />
+      </mesh>
+    </group>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Framed desk photo — the portrait lives in the room, not the CV      */
+/* ------------------------------------------------------------------ */
+
+const FRAME_W = 0.118
+const FRAME_H = 0.168
+const FRAME_T = 0.013
+const FRAME_INSET = 0.012
+
+export function DeskPhoto(props: { position: [number, number, number]; shadow: boolean }) {
+  const map = useMemo(() => {
+    const texture = new THREE.TextureLoader().load(avatarUrl, () => invalidate())
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 4
+    return texture
+  }, [])
+
+  return (
+    <group position={props.position} rotation-y={0.18} rotation-x={-0.1}>
+      <RoundedBox
+        args={[FRAME_W, FRAME_H, FRAME_T]}
+        radius={0.003}
+        position={[0, FRAME_H / 2, 0]}
+        castShadow={props.shadow}
+        material={mats.woodDark}
+      />
+      <mesh position={[0, FRAME_H / 2, FRAME_T / 2 + 0.0004]}>
+        <planeGeometry args={[FRAME_W - 0.016, FRAME_H - 0.016]} />
+        <meshStandardMaterial color={palette.cream} roughness={0.9} />
+      </mesh>
+      <mesh position={[0, FRAME_H / 2, FRAME_T / 2 + 0.001]}>
+        <planeGeometry args={[FRAME_W - FRAME_INSET * 2, FRAME_H - FRAME_INSET * 2]} />
+        <meshStandardMaterial map={map} roughness={0.65} metalness={0} />
+      </mesh>
+      <mesh
+        position={[0, 0.03, -0.03]}
+        rotation-x={0.62}
+        castShadow={props.shadow}
+        material={mats.woodDark}
+      >
+        <boxGeometry args={[0.046, 0.064, 0.005]} />
       </mesh>
     </group>
   )
