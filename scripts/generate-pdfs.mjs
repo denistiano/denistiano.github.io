@@ -1,12 +1,11 @@
 /**
  * Renders the /?print=<lang> route of the built site with headless
- * Chromium and saves real-text, ATS-friendly A4 PDFs into public/cv/
- * (source of truth, committed) and dist/cv/ (so the current build can
- * be deployed immediately without a second build pass).
+ * Chromium and writes ATS-friendly A4 PDFs into dist/cv/ so they ship
+ * with the GitHub Pages artifact. Nothing is written into the repo.
  *
  * Usage: npm run pdf   (expects `npm run build` to have run first)
  */
-import { mkdir, copyFile } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { preview } from 'vite'
@@ -18,6 +17,7 @@ const FILES = {
 }
 
 const root = process.cwd()
+const distCv = path.join(root, 'dist', 'cv')
 
 if (!existsSync(path.join(root, 'dist', 'index.html'))) {
   console.error('dist/ not found — run `npm run build` first.')
@@ -36,22 +36,19 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--disable-setuid-sandbox', '--font-render-hinting=none'],
 })
 
-await mkdir(path.join(root, 'public', 'cv'), { recursive: true })
-await mkdir(path.join(root, 'dist', 'cv'), { recursive: true })
+await mkdir(distCv, { recursive: true })
 
 for (const [lang, file] of Object.entries(FILES)) {
   const page = await browser.newPage()
   await page.goto(`${url}?print=${lang}`, { waitUntil: 'networkidle0' })
   await page.evaluateHandle('document.fonts.ready')
 
-  const out = path.join(root, 'public', 'cv', file)
   await page.pdf({
-    path: out,
+    path: path.join(distCv, file),
     format: 'A4',
     printBackground: true,
     preferCSSPageSize: true,
   })
-  await copyFile(out, path.join(root, 'dist', 'cv', file))
   await page.close()
   console.log(`✓ ${file}`)
 }
@@ -60,4 +57,4 @@ await browser.close()
 await new Promise((resolve, reject) =>
   server.httpServer.close((err) => (err ? reject(err) : resolve())),
 )
-console.log('PDFs generated.')
+console.log('PDFs generated in dist/cv/.')

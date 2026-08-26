@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Generated at deploy time (npm run pdf / CI)
+public/cv/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
