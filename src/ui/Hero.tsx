@@ -7,8 +7,8 @@ import { pdfHref } from './pdf'
 
 /**
  * The landing text block. On scroll, each character dissolves —
- * drifting up, blurring, fading — staggered pseudo-randomly so the
- * headline evaporates rather than slides away.
+ * drifting up and fading, staggered pseudo-randomly so the headline
+ * evaporates rather than slides away.
  */
 export function Hero() {
   const { cv, lang } = useLanguage()
@@ -17,8 +17,8 @@ export function Hero() {
   const subRef = useRef<HTMLParagraphElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const kickerRef = useRef<HTMLParagraphElement>(null)
+  const dissolved = useRef(false)
 
-  // Stable per-character stagger offsets (shuffled, seeded by index).
   const staggers = useMemo(() => {
     const total = cv.hero.headline.join('').length
     return Array.from({ length: total }, (_, i) => {
@@ -33,27 +33,33 @@ export function Hero() {
     const d = span(p, BEATS.heroDissolveStart, BEATS.heroDissolveEnd)
 
     if (d >= 1) {
-      root.style.visibility = 'hidden'
+      if (!dissolved.current) {
+        dissolved.current = true
+        root.style.visibility = 'hidden'
+        root.classList.remove('is-dissolving')
+      }
       return
     }
+    dissolved.current = false
+
+    if (d <= 0) {
+      if (root.style.visibility !== 'visible') root.style.visibility = 'visible'
+      root.style.pointerEvents = 'auto'
+      return
+    }
+
     root.style.visibility = 'visible'
     root.style.pointerEvents = d > 0.35 ? 'none' : 'auto'
+    root.classList.add('is-dissolving')
 
     charsRef.current.forEach((el, i) => {
       if (!el) return
       const local = smoothstep(span(d, staggers[i] * 0.45, staggers[i] * 0.45 + 0.55))
-      if (local <= 0) {
-        el.style.opacity = '1'
-        el.style.transform = 'none'
-        el.style.filter = 'none'
-        return
-      }
+      if (local <= 0) return
       el.style.opacity = String(1 - local)
       el.style.transform = `translateY(${-34 * local}px) rotate(${(staggers[i] - 0.3) * 14 * local}deg)`
-      el.style.filter = `blur(${5 * local}px)`
     })
 
-    // Kicker and sub fade a touch earlier, CTAs first.
     const fadeEarly = smoothstep(span(d, 0, 0.55))
     if (kickerRef.current) kickerRef.current.style.opacity = String(1 - fadeEarly)
     if (subRef.current) {

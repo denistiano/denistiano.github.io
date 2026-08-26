@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { invalidate } from '@react-three/fiber'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { SceneRoot } from './scene/SceneRoot'
 import { Hero } from './ui/Hero'
@@ -11,15 +12,13 @@ import { attachPointer } from './scroll/pointer'
 import { useScrollFrame } from './scroll/useScrollFrame'
 import { BEATS, lerp } from './scroll/choreography'
 import { scene as sceneCfg } from './theme'
+import { canvasHideProgress, initQuality } from './quality'
 
 function Experience() {
-  const simplified = useMemo(
-    () => window.innerWidth < 900 || navigator.hardwareConcurrency <= 4,
-    [],
-  )
-  // Extra runway appended after the cinematic act = how far the CV
-  // content inside the laptop screen can scroll.
+  const quality = useMemo(() => initQuality(), [])
   const [extraScroll, setExtraScroll] = useState(3000)
+  const [sceneLive, setSceneLive] = useState(true)
+  const liveRef = useRef(true)
   const onExtraScroll = useCallback((px: number) => {
     setExtraScroll((prev) => (Math.abs(prev - px) > 1 ? px : prev))
   }, [])
@@ -30,22 +29,26 @@ function Experience() {
     return () => scrollEngine.stop()
   }, [])
 
-  // Flip the DOM chrome (nav, rail) to its dark variant as the world darkens.
-  useScrollFrame(({ progress: p }) => {
+  useScrollFrame(({ progress: p, target }) => {
     document.body.classList.toggle('dark-world', p > lerp(BEATS.darkenStart, BEATS.darkenEnd, 0.5))
+
+    const hideAt = canvasHideProgress()
+    const live = p < hideAt || target < hideAt
+    if (live === liveRef.current) return
+    liveRef.current = live
+    scrollEngine.sceneLive = live
+    setSceneLive(live)
+    if (live) invalidate()
   })
 
   return (
     <div className="experience">
-      <SceneRoot simplified={simplified} />
+      <SceneRoot quality={quality} live={sceneLive} />
       <Hero />
       <LaptopFrame onExtraScroll={onExtraScroll} />
       <Navbar />
       <ScrollHint />
       <ProgressRail />
-      {/* The only thing that actually scrolls: the cinematic runway plus
-          the content's own height. One extra viewport compensates for the
-          fact that max scroll = document height - viewport height. */}
       <div
         className="scroll-spacer"
         style={{ height: `calc(${(sceneCfg.cinematicPages + 1) * 100}vh + ${extraScroll}px)` }}

@@ -88,6 +88,11 @@ a {
   z-index: 0;
 }
 
+.scene-canvas.is-idle {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .scroll-spacer {
   position: relative;
   width: 1px;
@@ -357,7 +362,10 @@ body.dark-world .btn-primary {
 
 .hero-char {
   display: inline-block;
-  will-change: transform, opacity, filter;
+}
+
+.hero.is-dissolving .hero-char {
+  will-change: transform, opacity;
 }
 
 .hero-sub {
@@ -1055,8 +1063,7 @@ body.dark-world .progress-rail {
   .hero-inner {
     width: 100%;
     margin: 0 20px calc(14vh);
-    background: color-mix(in srgb, var(--bg) 72%, transparent);
-    backdrop-filter: blur(6px);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
     border-radius: 20px;
     padding: 20px;
   }

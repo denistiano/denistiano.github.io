@@ -46,7 +46,7 @@ export function Dust({ count = 70 }: { count?: number }) {
   })
 
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, count]} frustumCulled={false}>
+    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
       <sphereGeometry args={[0.006, 6, 6]} />
       <meshBasicMaterial color="#ffffff" transparent opacity={0.35} depthWrite={false} />
     </instancedMesh>

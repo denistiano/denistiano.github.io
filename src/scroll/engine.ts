@@ -1,6 +1,7 @@
 import Lenis from 'lenis'
-import { addEffect } from '@react-three/fiber'
+import { invalidate } from '@react-three/fiber'
 import { scene as sceneCfg } from '../theme'
+import { canvasHideProgress } from '../quality'
 
 export interface ScrollState {
   /** Smoothed scroll position in px, straight from Lenis. */
@@ -20,17 +21,12 @@ export interface ScrollState {
 type Subscriber = (state: ScrollState, dt: number) => void
 
 /**
- * One frame loop to rule them all.
+ * Own rAF, independent of the WebGL canvas.
  *
- * R3F's `addEffect` callbacks run once per frame *before* the canvas
- * renders, so Lenis, the damping pass, and every DOM subscriber all see
- * the exact same snapshot the 3D scene is about to be drawn with.
- *
- * The cinematic `progress` is never the raw scroll value: it is
- * critically-damped toward it (interruptible spring), so a violent
- * flick produces one continuous, weighted motion. The content phase
- * deliberately skips that extra damping — it reads Lenis directly, so
- * reading the CV feels like perfectly ordinary smooth scrolling.
+ * DOM subscribers (hero, laptop frame, rail) keep working during the
+ * content act without forcing a 3D render. The canvas is on
+ * `frameloop="demand"` and is only `invalidate()`-d while the cinematic
+ * is still on screen.
  */
 class ScrollEngine {
   readonly state: ScrollState = {
@@ -42,13 +38,21 @@ class ScrollEngine {
     total: 0,
   }
   cinematicLength = sceneCfg.cinematicPages * (typeof window !== 'undefined' ? window.innerHeight : 800)
+  /** When false the 3D view is covered — skip invalidate(). */
+  sceneLive = true
   private lenis: Lenis | null = null
   private subscribers = new Set<Subscriber>()
-  private removeEffect: (() => void) | null = null
   private lastTime = -1
   private smoothTime = 0.42
+  private rafId = 0
   private onResize = () => {
     this.cinematicLength = sceneCfg.cinematicPages * window.innerHeight
+    if (this.sceneLive) invalidate()
+    this.schedule()
+  }
+  private onVisibility = () => {
+    if (document.hidden) this.cancel()
+    else this.schedule()
   }
 
   start(smoothTime: number) {
@@ -56,37 +60,21 @@ class ScrollEngine {
     this.smoothTime = smoothTime
     this.onResize()
     window.addEventListener('resize', this.onResize)
+    document.addEventListener('visibilitychange', this.onVisibility)
     this.lenis = new Lenis({
       duration: 1.1,
       smoothWheel: true,
       touchMultiplier: 1.4,
       autoRaf: false,
     })
-
-    this.removeEffect = addEffect((time: number) => {
-      const lenis = this.lenis
-      if (!lenis) return
-      lenis.raf(time)
-
-      const s = this.state
-      s.scroll = lenis.scroll
-      s.target = clamp01(lenis.scroll / this.cinematicLength)
-      s.contentOffset = Math.max(0, lenis.scroll - this.cinematicLength)
-      s.total = clamp01(lenis.scroll / Math.max(1, lenis.limit))
-
-      if (this.lastTime < 0) this.lastTime = time
-      const dt = Math.min(0.1, Math.max(0.0005, (time - this.lastTime) / 1000))
-      this.lastTime = time
-
-      this.damp(dt)
-      for (const cb of this.subscribers) cb(s, dt)
-    })
+    this.lenis.on('scroll', this.schedule)
+    this.schedule()
   }
 
   stop() {
     window.removeEventListener('resize', this.onResize)
-    this.removeEffect?.()
-    this.removeEffect = null
+    document.removeEventListener('visibilitychange', this.onVisibility)
+    this.cancel()
     this.lenis?.destroy()
     this.lenis = null
     this.lastTime = -1
@@ -109,11 +97,65 @@ class ScrollEngine {
       easing: (t: number) => 1 - Math.pow(1 - t, 3),
       lock: true,
     })
+    this.schedule()
   }
 
   /** Fly to a cinematic progress position (0-1). */
   flyTo(progress: number) {
     this.scrollToPx(progress * this.cinematicLength)
+  }
+
+  /** Pointer parallax: one demand frame while the 3D act is visible. */
+  notePointer() {
+    if (!this.sceneLive || document.hidden) return
+    const s = this.state
+    const hideAt = canvasHideProgress()
+    if (s.progress >= hideAt && s.target >= hideAt) return
+    invalidate()
+  }
+
+  schedule = () => {
+    if (this.rafId || document.hidden || !this.lenis) return
+    this.rafId = requestAnimationFrame(this.tick)
+  }
+
+  private cancel() {
+    if (!this.rafId) return
+    cancelAnimationFrame(this.rafId)
+    this.rafId = 0
+  }
+
+  private tick = (time: number) => {
+    this.rafId = 0
+    const lenis = this.lenis
+    if (!lenis) return
+
+    lenis.raf(time)
+
+    const s = this.state
+    s.scroll = lenis.scroll
+    s.target = clamp01(lenis.scroll / this.cinematicLength)
+    s.contentOffset = Math.max(0, lenis.scroll - this.cinematicLength)
+    s.total = clamp01(lenis.scroll / Math.max(1, lenis.limit))
+
+    if (this.lastTime < 0) this.lastTime = time
+    const dt = Math.min(0.1, Math.max(0.0005, (time - this.lastTime) / 1000))
+    this.lastTime = time
+
+    this.damp(dt)
+    for (const cb of this.subscribers) cb(s, dt)
+
+    const moving =
+      Math.abs(s.velocity) > 1e-4 ||
+      Math.abs(s.progress - s.target) > 1e-4 ||
+      Math.abs(lenis.velocity) > 0.02
+
+    if (this.sceneLive && moving) {
+      const hideAt = canvasHideProgress()
+      if (s.progress < hideAt || s.target < hideAt) invalidate()
+    }
+
+    if (moving) this.schedule()
   }
 
   /** Critically damped spring (Unity SmoothDamp) — interruptible, no overshoot. */

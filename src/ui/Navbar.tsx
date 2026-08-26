@@ -2,7 +2,8 @@ import { useRef, useState } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useScrollFrame } from '../scroll/useScrollFrame'
 import { scrollEngine } from '../scroll/engine'
-import { activeSection, SECTION_NAV_KEYS, SECTION_ORDER, sectionEls, type SectionId } from './sections'
+import { activeSectionCached } from './sectionCache'
+import { SECTION_NAV_KEYS, SECTION_ORDER, sectionEls, type SectionId } from './sections'
 import { pdfHref } from './pdf'
 
 export function Navbar() {
@@ -14,9 +15,8 @@ export function Navbar() {
   useScrollFrame((s) => {
     const nav = navRef.current
     if (!nav) return
-    // Sections only become "active" once we're inside the content act.
     const active =
-      s.target >= 1 ? (activeSection(s.contentOffset, window.innerHeight * 0.8) ?? '') : ''
+      s.target >= 1 ? (activeSectionCached(s.contentOffset, window.innerHeight * 0.8) ?? '') : ''
     if (active !== activeRef.current) {
       activeRef.current = active
       nav.querySelectorAll<HTMLButtonElement>('[data-chapter]').forEach((el) => {

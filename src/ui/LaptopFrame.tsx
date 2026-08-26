@@ -4,20 +4,14 @@ import { useScrollFrame } from '../scroll/useScrollFrame'
 import { BEATS, span, smoothstep } from '../scroll/choreography'
 import { sceneRefs } from '../scene/refs'
 import { scene as sceneCfg } from '../theme'
-import { activeSection, SECTION_NAV_KEYS, SECTION_ORDER } from './sections'
+import { SECTION_NAV_KEYS, SECTION_ORDER } from './sections'
+import { activeSectionCached, cacheSectionOffsets } from './sectionCache'
 import { About } from './chapters/About'
 import { Journey } from './chapters/Journey'
 import { Flagship } from './chapters/Flagship'
 import { Skills } from './chapters/Skills'
 import { Contact } from './chapters/Contact'
 
-/**
- * The laptop screen as a DOM surface. The container is re-projected
- * over the 3D screen every frame (ScreenFrameSync), so we never leave
- * the scene — the CV content simply plays on the laptop. Scroll past
- * the cinematic act translates the inner column 1:1: perfectly normal
- * scrolling inside the screen.
- */
 export function LaptopFrame({ onExtraScroll }: { onExtraScroll: (px: number) => void }) {
   const { cv, ui, lang } = useLanguage()
   const rootRef = useRef<HTMLDivElement>(null)
@@ -25,8 +19,10 @@ export function LaptopFrame({ onExtraScroll }: { onExtraScroll: (px: number) => 
   const contentRef = useRef<HTMLDivElement>(null)
   const beatRef = useRef<HTMLSpanElement>(null)
   const lastLabel = useRef('')
+  const layout = useRef({ maxScroll: 0, boxH: 0 })
+  const lastY = useRef(-1)
+  const lastOpacity = useRef(-1)
 
-  // Register the container for the 3D projection.
   useEffect(() => {
     sceneRefs.frameEl = rootRef.current
     return () => {
@@ -34,16 +30,20 @@ export function LaptopFrame({ onExtraScroll }: { onExtraScroll: (px: number) => 
     }
   }, [])
 
-  // Tell the page how much extra scroll runway the content needs.
   useEffect(() => {
     const content = contentRef.current
-    if (!content) return
+    const box = boxRef.current
+    if (!content || !box) return
     const report = () => {
-      const boxH = boxRef.current?.clientHeight || sceneCfg.screenFillH * window.innerHeight - 40
-      onExtraScroll(Math.max(0, content.scrollHeight - boxH))
+      const boxH = box.clientHeight || sceneCfg.screenFillH * window.innerHeight - 40
+      layout.current.boxH = boxH
+      layout.current.maxScroll = Math.max(0, content.scrollHeight - boxH)
+      cacheSectionOffsets(boxH)
+      onExtraScroll(layout.current.maxScroll)
     }
     const ro = new ResizeObserver(report)
     ro.observe(content)
+    ro.observe(box)
     window.addEventListener('resize', report)
     report()
     return () => {
@@ -52,7 +52,6 @@ export function LaptopFrame({ onExtraScroll }: { onExtraScroll: (px: number) => 
     }
   }, [onExtraScroll, lang])
 
-  // Scroll-reveal for content blocks (normal, intuitive, once).
   useEffect(() => {
     const content = contentRef.current
     if (!content) return
@@ -76,24 +75,30 @@ export function LaptopFrame({ onExtraScroll }: { onExtraScroll: (px: number) => 
     if (!el) return
     const v = smoothstep(span(s.progress, BEATS.screenEnterStart, BEATS.screenEnterEnd))
     if (v <= 0.001) {
-      el.style.visibility = 'hidden'
-      el.style.pointerEvents = 'none'
+      if (el.style.visibility !== 'hidden') {
+        el.style.visibility = 'hidden'
+        el.style.pointerEvents = 'none'
+      }
       return
     }
     el.style.visibility = 'visible'
-    el.style.opacity = String(v)
+    if (Math.abs(v - lastOpacity.current) > 0.002) {
+      lastOpacity.current = v
+      el.style.opacity = String(v)
+    }
     el.style.pointerEvents = v > 0.8 ? 'auto' : 'none'
 
-    // Normal scrolling: translate the column by the post-cinematic scroll.
-    const box = boxRef.current
+    const { maxScroll } = layout.current
+    const y = Math.min(s.contentOffset, maxScroll)
     const content = contentRef.current
-    if (box && content) {
-      const max = Math.max(0, content.scrollHeight - box.clientHeight)
-      const y = Math.min(s.contentOffset, max)
+    if (content && Math.abs(y - lastY.current) > 0.5) {
+      lastY.current = y
       content.style.transform = `translate3d(0, ${-y.toFixed(1)}px, 0)`
+    }
 
-      // Section indicator in the chrome bar.
-      const id = activeSection(y, box.clientHeight)
+    const boxH = layout.current.boxH
+    if (boxH > 0) {
+      const id = activeSectionCached(y, boxH)
       const idx = id ? SECTION_ORDER.indexOf(id) + 1 : 0
       const text = id
         ? `${String(idx).padStart(2, '0')} / ${String(SECTION_ORDER.length).padStart(2, '0')} — ${ui.nav[SECTION_NAV_KEYS[id]]}`

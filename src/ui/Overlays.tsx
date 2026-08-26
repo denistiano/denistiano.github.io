@@ -7,11 +7,14 @@ import { span } from '../scroll/choreography'
 export function ScrollHint() {
   const { cv } = useLanguage()
   const ref = useRef<HTMLDivElement>(null)
+  const last = useRef(-1)
 
   useScrollFrame(({ progress: p }) => {
     const el = ref.current
     if (!el) return
     const v = 1 - span(p, 0.004, 0.05)
+    if (Math.abs(v - last.current) < 0.01) return
+    last.current = v
     el.style.opacity = String(v)
     el.style.visibility = v <= 0.01 ? 'hidden' : 'visible'
   })
@@ -29,9 +32,15 @@ export function ScrollHint() {
 /** Thin progress track on the right edge, tracking the whole page. */
 export function ProgressRail() {
   const fillRef = useRef<HTMLDivElement>(null)
+  const last = useRef(-1)
 
   useScrollFrame((s) => {
-    if (fillRef.current) fillRef.current.style.transform = `scaleY(${s.total})`
+    const el = fillRef.current
+    if (!el) return
+    const t = Math.round(s.total * 1000) / 1000
+    if (t === last.current) return
+    last.current = t
+    el.style.transform = `scaleY(${t})`
   })
 
   return (

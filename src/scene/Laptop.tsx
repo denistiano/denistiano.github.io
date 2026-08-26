@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { palette } from '../theme'
+import type { QualitySettings } from '../quality'
 import { scrollEngine } from '../scroll/engine'
 import { BEATS, span, smoothstep, lerp } from '../scroll/choreography'
 import { ScreenCanvasTexture } from './ScreenCanvasTexture'
@@ -65,7 +66,11 @@ function buildKeyLayout(): KeyDef[] {
  * scroll progress; the screen shows a live typing canvas texture and
  * spills light onto the desk as it opens.
  */
-export function Laptop(props: { position?: [number, number, number]; rotationY?: number }) {
+export function Laptop(props: {
+  position?: [number, number, number]
+  rotationY?: number
+  quality: QualitySettings
+}) {
   const lidRef = useRef<THREE.Group>(null)
   const anchorRef = useRef<THREE.Group>(null)
   const ledRef = useRef<THREE.Mesh>(null)
@@ -117,29 +122,28 @@ export function Laptop(props: { position?: [number, number, number]; rotationY?:
     // DOM layer has fully taken over (handoff complete) the canvas
     // repaint + texture upload is skipped entirely.
     const handoff = smoothstep(span(p, BEATS.screenEnterStart, BEATS.screenEnterEnd))
-    if (open > 0.02 && handoff < 0.995) screen.update(t)
+    const { quality } = props
+    if (quality.liveScreen && open > 0.02 && handoff < 0.995) screen.update(t)
     if (screenMat.current) {
       screenMat.current.opacity = Math.min(1, open * 2.5) * (1 - handoff)
     }
 
-    // Light spilling out of the screen grows with the opening; the
-    // keyboard backlight breathes on with it.
+    const breathe = quality.idleMotion
     if (screenLight.current) {
-      screenLight.current.intensity = open * 1.1 + Math.sin(t * 2.3) * 0.03 * open
+      screenLight.current.intensity = open * 1.1 + (breathe ? Math.sin(t * 2.3) * 0.03 * open : 0)
     }
-    keyMat.emissiveIntensity = open * (0.22 + Math.sin(t * 1.8) * 0.04)
+    keyMat.emissiveIntensity = open * (0.22 + (breathe ? Math.sin(t * 1.8) * 0.04 : 0))
 
-    // Sleep LED breathes while (almost) closed, dies once open.
     if (ledRef.current) {
       const mat = ledRef.current.material as THREE.MeshStandardMaterial
-      mat.emissiveIntensity = (1 - open) * (1.4 + Math.sin(t * 2.1) * 1.1)
+      mat.emissiveIntensity = (1 - open) * (1.4 + (breathe ? Math.sin(t * 2.1) * 1.1 : 0.4))
     }
   })
 
   return (
     <group position={props.position} rotation-y={props.rotationY ?? 0}>
       {/* Base */}
-      <RoundedBox args={[BODY_W, 0.024, BODY_D]} radius={0.008} position={[0, 0.012, 0]} castShadow receiveShadow>
+      <RoundedBox args={[BODY_W, 0.024, BODY_D]} radius={0.008} position={[0, 0.012, 0]} castShadow={props.quality.shadows} receiveShadow={props.quality.shadows}>
         <meshStandardMaterial color="#aeb4ba" metalness={0.35} roughness={0.5} />
       </RoundedBox>
 
@@ -193,7 +197,7 @@ export function Laptop(props: { position?: [number, number, number]; rotationY?:
           args={[BODY_W, 0.016, BODY_D]}
           radius={0.007}
           position={[0, 0.008, BODY_D / 2]}
-          castShadow
+          castShadow={props.quality.shadows}
         >
           <meshStandardMaterial color="#b6bcc2" metalness={0.4} roughness={0.45} />
         </RoundedBox>
@@ -233,15 +237,16 @@ export function Laptop(props: { position?: [number, number, number]; rotationY?:
           rotation-x={Math.PI / 2}
         />
 
-        {/* Light spilling from the screen */}
-        <pointLight
-          ref={screenLight}
-          position={[0, -0.09, BODY_D / 2 - 0.05]}
-          color="#9db8d4"
-          intensity={0}
-          distance={1.4}
-          decay={2}
-        />
+        {props.quality.pointLights && (
+          <pointLight
+            ref={screenLight}
+            position={[0, -0.09, BODY_D / 2 - 0.05]}
+            color="#9db8d4"
+            intensity={0}
+            distance={1.4}
+            decay={2}
+          />
+        )}
       </group>
     </group>
   )

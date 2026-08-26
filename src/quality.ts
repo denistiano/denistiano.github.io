@@ -1,0 +1,99 @@
+import { BEATS } from './scroll/choreography'
+
+export type QualityTier = 'high' | 'medium' | 'low'
+
+export interface QualitySettings {
+  tier: QualityTier
+  dpr: [number, number]
+  shadows: boolean
+  shadowMapSize: number
+  antialias: boolean
+  dust: number
+  floatingShapes: boolean
+  pointLights: boolean
+  steam: boolean
+  idleMotion: boolean
+  liveScreen: boolean
+  powerPreference: WebGLPowerPreference
+}
+
+const HIGH: QualitySettings = {
+  tier: 'high',
+  dpr: [1, 1.5],
+  shadows: true,
+  shadowMapSize: 1024,
+  antialias: true,
+  dust: 40,
+  floatingShapes: true,
+  pointLights: true,
+  steam: true,
+  idleMotion: true,
+  liveScreen: true,
+  powerPreference: 'high-performance',
+}
+
+const MEDIUM: QualitySettings = {
+  tier: 'medium',
+  dpr: [1, 1.25],
+  shadows: false,
+  shadowMapSize: 512,
+  antialias: false,
+  dust: 20,
+  floatingShapes: false,
+  pointLights: false,
+  steam: false,
+  idleMotion: true,
+  liveScreen: true,
+  powerPreference: 'low-power',
+}
+
+const LOW: QualitySettings = {
+  tier: 'low',
+  dpr: [1, 1],
+  shadows: false,
+  shadowMapSize: 512,
+  antialias: false,
+  dust: 0,
+  floatingShapes: false,
+  pointLights: false,
+  steam: false,
+  idleMotion: false,
+  liveScreen: false,
+  powerPreference: 'low-power',
+}
+
+let current: QualitySettings = HIGH
+
+export function getQuality() {
+  return current
+}
+
+export function initQuality() {
+  current = detectQuality()
+  return current
+}
+
+export function detectQuality(): QualitySettings {
+  const nav = navigator as Navigator & {
+    deviceMemory?: number
+    connection?: { saveData?: boolean }
+  }
+  const cores = nav.hardwareConcurrency || 4
+  const mem = nav.deviceMemory
+  const saveData = Boolean(nav.connection?.saveData)
+  const narrow = window.innerWidth < 900
+  const coarse = window.matchMedia('(pointer: coarse)').matches
+
+  if (saveData || (mem !== undefined && mem <= 4) || cores <= 2 || (narrow && coarse)) {
+    return LOW
+  }
+  if (narrow || cores <= 4 || (mem !== undefined && mem <= 8)) {
+    return MEDIUM
+  }
+  return HIGH
+}
+
+/** Progress at which the 3D canvas is fully covered and can sleep. */
+export function canvasHideProgress(viewportW = window.innerWidth) {
+  return viewportW < 900 ? BEATS.screenEnterStart : BEATS.screenEnterEnd
+}

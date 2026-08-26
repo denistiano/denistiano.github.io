@@ -3,33 +3,31 @@ import { useFrame } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { palette } from '../theme'
+import type { QualitySettings } from '../quality'
 import { scrollEngine } from '../scroll/engine'
 import { BEATS, span, smoothstep } from '../scroll/choreography'
+import { mats } from './materials'
 
 /* ------------------------------------------------------------------ */
 /* Desk                                                                */
 /* ------------------------------------------------------------------ */
 
-export function Desk() {
+export function Desk({ shadow }: { shadow: boolean }) {
   return (
     <group>
-      <RoundedBox args={[2.3, 0.06, 1.1]} radius={0.02} position={[0, 0.72, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={palette.deskWood} roughness={0.75} />
-      </RoundedBox>
+      <RoundedBox args={[2.3, 0.06, 1.1]} radius={0.02} position={[0, 0.72, 0]} castShadow={shadow} receiveShadow={shadow} material={mats.wood} />
       {[
         [-1.05, -0.44],
         [1.05, -0.44],
         [-1.05, 0.44],
         [1.05, 0.44],
       ].map(([x, z], i) => (
-        <mesh key={i} position={[x, 0.35, z]} castShadow>
+        <mesh key={i} position={[x, 0.35, z]} castShadow={shadow} material={mats.graphite}>
           <boxGeometry args={[0.05, 0.7, 0.05]} />
-          <meshStandardMaterial color={palette.graphite} roughness={0.6} />
         </mesh>
       ))}
-      <mesh position={[0, 0.12, -0.44]}>
+      <mesh position={[0, 0.12, -0.44]} material={mats.graphite}>
         <boxGeometry args={[2.1, 0.04, 0.04]} />
-        <meshStandardMaterial color={palette.graphite} roughness={0.6} />
       </mesh>
     </group>
   )
@@ -39,59 +37,42 @@ export function Desk() {
 /* Office chair                                                        */
 /* ------------------------------------------------------------------ */
 
-const chairFabric = '#343a44'
-const chairMetal = '#9aa0a6'
-
-export function Chair() {
+export function Chair({ shadow }: { shadow: boolean }) {
   return (
     <group position={[0.24, 0, -0.88]} rotation-y={0.5}>
-      {/* Seat */}
-      <RoundedBox args={[0.46, 0.08, 0.44]} radius={0.035} position={[0, 0.47, 0]} castShadow>
-        <meshStandardMaterial color={chairFabric} roughness={0.85} />
-      </RoundedBox>
-      {/* Backrest, gently reclined, on a support bracket */}
-      <mesh position={[0, 0.56, 0.2]} rotation-x={0.16}>
+      <RoundedBox args={[0.46, 0.08, 0.44]} radius={0.035} position={[0, 0.47, 0]} castShadow={shadow} material={mats.fabric} />
+      <mesh position={[0, 0.56, 0.2]} rotation-x={0.16} material={mats.metal}>
         <boxGeometry args={[0.05, 0.18, 0.03]} />
-        <meshStandardMaterial color={chairMetal} metalness={0.5} roughness={0.4} />
       </mesh>
-      <RoundedBox args={[0.42, 0.46, 0.06]} radius={0.03} position={[0, 0.78, 0.235]} rotation-x={0.16} castShadow>
-        <meshStandardMaterial color={chairFabric} roughness={0.85} />
-      </RoundedBox>
-      {/* Armrests */}
+      <RoundedBox args={[0.42, 0.46, 0.06]} radius={0.03} position={[0, 0.78, 0.235]} rotation-x={0.16} castShadow={shadow} material={mats.fabric} />
       {[-0.245, 0.245].map((x) => (
         <group key={x} position={[x, 0.5, 0.02]}>
-          <mesh position={[0, 0.05, 0]}>
+          <mesh position={[0, 0.05, 0]} material={mats.graphite}>
             <cylinderGeometry args={[0.014, 0.014, 0.12, 10]} />
-            <meshStandardMaterial color={palette.graphite} roughness={0.6} />
           </mesh>
-          <RoundedBox args={[0.05, 0.025, 0.2]} radius={0.01} position={[0, 0.12, 0]} castShadow>
-            <meshStandardMaterial color={palette.graphite} roughness={0.7} />
-          </RoundedBox>
+          <mesh position={[0, 0.12, 0]} material={mats.graphiteDull}>
+            <boxGeometry args={[0.05, 0.025, 0.2]} />
+          </mesh>
         </group>
       ))}
-      {/* Gas lift + mount plate + five-star base with casters */}
-      <RoundedBox args={[0.15, 0.03, 0.15]} radius={0.008} position={[0, 0.445, 0]}>
-        <meshStandardMaterial color={palette.graphite} roughness={0.6} />
-      </RoundedBox>
-      <mesh position={[0, 0.27, 0]}>
-        <cylinderGeometry args={[0.022, 0.028, 0.36, 12]} />
-        <meshStandardMaterial color={chairMetal} metalness={0.6} roughness={0.35} />
+      <mesh position={[0, 0.445, 0]} material={mats.graphite}>
+        <boxGeometry args={[0.15, 0.03, 0.15]} />
       </mesh>
-      <mesh position={[0, 0.08, 0]}>
+      <mesh position={[0, 0.27, 0]} material={mats.metal}>
+        <cylinderGeometry args={[0.022, 0.028, 0.36, 12]} />
+      </mesh>
+      <mesh position={[0, 0.08, 0]} material={mats.metal}>
         <cylinderGeometry args={[0.034, 0.04, 0.09, 12]} />
-        <meshStandardMaterial color={chairMetal} metalness={0.6} roughness={0.35} />
       </mesh>
       {[0, 1, 2, 3, 4].map((i) => {
         const a = (i / 5) * Math.PI * 2 + 0.3
         return (
           <group key={i} rotation-y={-a}>
-            <mesh position={[0.14, 0.055, 0]} rotation-z={-0.18} castShadow>
+            <mesh position={[0.14, 0.055, 0]} rotation-z={-0.18} castShadow={shadow} material={mats.metal}>
               <boxGeometry args={[0.24, 0.028, 0.045]} />
-              <meshStandardMaterial color={chairMetal} metalness={0.6} roughness={0.35} />
             </mesh>
-            <mesh position={[0.25, 0.028, 0]}>
+            <mesh position={[0.25, 0.028, 0]} material={mats.graphite}>
               <sphereGeometry args={[0.028, 12, 12]} />
-              <meshStandardMaterial color={palette.graphite} roughness={0.5} />
             </mesh>
           </group>
         )
@@ -104,55 +85,48 @@ export function Chair() {
 /* Architect desk lamp: shade opens DOWN toward the desk               */
 /* ------------------------------------------------------------------ */
 
-export function Lamp(props: { position: [number, number, number] }) {
+export function Lamp(props: { position: [number, number, number]; quality: QualitySettings }) {
   const light = useRef<THREE.PointLight>(null)
   const bulb = useRef<THREE.MeshStandardMaterial>(null)
+  const segs = props.quality.tier === 'low' ? 8 : 12
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
     const p = scrollEngine.state.progress
     const approach = smoothstep(span(p, BEATS.heroDissolveStart, BEATS.zoomStart))
-    const breath = 0.55 + Math.sin(t * 1.4) * 0.12 + approach * 0.9
-    if (light.current) light.current.intensity = breath
-    if (bulb.current) bulb.current.emissiveIntensity = 0.7 + Math.sin(t * 1.4) * 0.18 + approach * 0.6
+    const breath = props.quality.idleMotion ? Math.sin(t * 1.4) * 0.12 : 0
+    if (light.current) light.current.intensity = 0.55 + breath + approach * 0.9
+    if (bulb.current) bulb.current.emissiveIntensity = 0.7 + breath * 1.5 + approach * 0.6
   })
 
   return (
     <group position={props.position} rotation-y={-2.35}>
-      {/* Base */}
-      <mesh position={[0, 0.015, 0]} castShadow>
-        <cylinderGeometry args={[0.085, 0.1, 0.03, 24]} />
-        <meshStandardMaterial color={palette.graphite} roughness={0.5} />
+      <mesh position={[0, 0.015, 0]} castShadow={props.quality.shadows} material={mats.graphite}>
+        <cylinderGeometry args={[0.085, 0.1, 0.03, segs]} />
       </mesh>
-      <mesh position={[0, 0.035, 0]}>
-        <sphereGeometry args={[0.024, 12, 12]} />
-        <meshStandardMaterial color={palette.graphite} roughness={0.5} />
+      <mesh position={[0, 0.035, 0]} material={mats.graphite}>
+        <sphereGeometry args={[0.024, segs, segs]} />
       </mesh>
-      {/* Lower arm: leans forward (+x) */}
-      <mesh position={[0.055, 0.15, 0]} rotation-z={-0.42}>
+      <mesh position={[0.055, 0.15, 0]} rotation-z={-0.42} material={mats.graphite}>
         <cylinderGeometry args={[0.011, 0.011, 0.26, 10]} />
-        <meshStandardMaterial color={palette.graphite} roughness={0.5} />
       </mesh>
-      <mesh position={[0.108, 0.268, 0]}>
-        <sphereGeometry args={[0.02, 12, 12]} />
-        <meshStandardMaterial color={palette.graphite} roughness={0.5} />
+      <mesh position={[0.108, 0.268, 0]} material={mats.graphite}>
+        <sphereGeometry args={[0.02, segs, segs]} />
       </mesh>
-      {/* Upper arm: continues forward and slightly down */}
-      <mesh position={[0.21, 0.3, 0]} rotation-z={-1.28}>
+      <mesh position={[0.21, 0.3, 0]} rotation-z={-1.28} material={mats.graphite}>
         <cylinderGeometry args={[0.01, 0.01, 0.22, 10]} />
-        <meshStandardMaterial color={palette.graphite} roughness={0.5} />
       </mesh>
-      {/* Head: cone apex UP, opening DOWN over the desk */}
       <group position={[0.31, 0.27, 0]} rotation-z={0.35}>
-        <mesh castShadow>
-          <coneGeometry args={[0.075, 0.12, 24, 1, true]} />
-          <meshStandardMaterial color={palette.accent} roughness={0.55} side={THREE.DoubleSide} />
+        <mesh castShadow={props.quality.shadows} material={mats.accentShade}>
+          <coneGeometry args={[0.075, 0.12, segs, 1, true]} />
         </mesh>
         <mesh position={[0, -0.025, 0]}>
-          <sphereGeometry args={[0.034, 14, 14]} />
+          <sphereGeometry args={[0.034, segs, segs]} />
           <meshStandardMaterial ref={bulb} color="#fff3d6" emissive="#ffcf8a" emissiveIntensity={0.8} />
         </mesh>
-        <pointLight ref={light} position={[0, -0.09, 0]} color="#ffc98c" intensity={0.6} distance={1.9} decay={2} />
+        {props.quality.pointLights && (
+          <pointLight ref={light} position={[0, -0.09, 0]} color="#ffc98c" intensity={0.6} distance={1.9} decay={2} />
+        )}
       </group>
     </group>
   )
@@ -162,13 +136,14 @@ export function Lamp(props: { position: [number, number, number] }) {
 /* Mug: open cup, visible coffee, proper C-handle, steam               */
 /* ------------------------------------------------------------------ */
 
-export function Mug(props: { position: [number, number, number] }) {
+export function Mug(props: { position: [number, number, number]; quality: QualitySettings }) {
   const puffs = useRef<THREE.Group>(null)
   const N = 5
+  const segs = props.quality.tier === 'low' ? 10 : 16
 
   useFrame(({ clock }) => {
+    if (!props.quality.steam || !puffs.current) return
     const t = clock.elapsedTime
-    if (!puffs.current) return
     puffs.current.children.forEach((puff, i) => {
       const cycle = 3.6
       const local = ((t * 0.9 + i * (cycle / N)) % cycle) / cycle
@@ -182,39 +157,31 @@ export function Mug(props: { position: [number, number, number] }) {
 
   return (
     <group position={props.position}>
-      {/* Wall (open top, inside visible) */}
-      <mesh position={[0, 0.0475, 0]} castShadow>
-        <cylinderGeometry args={[0.042, 0.036, 0.095, 24, 1, true]} />
-        <meshStandardMaterial color={palette.mugClay} roughness={0.75} side={THREE.DoubleSide} />
+      <mesh position={[0, 0.0475, 0]} castShadow={props.quality.shadows} material={mats.clay}>
+        <cylinderGeometry args={[0.042, 0.036, 0.095, segs, 1, true]} />
       </mesh>
-      {/* Bottom */}
-      <mesh position={[0, 0.002, 0]} rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[0.036, 24]} />
-        <meshStandardMaterial color={palette.mugClay} roughness={0.75} />
+      <mesh position={[0, 0.002, 0]} rotation-x={-Math.PI / 2} material={mats.claySolid}>
+        <circleGeometry args={[0.036, segs]} />
       </mesh>
-      {/* Rim */}
-      <mesh position={[0, 0.095, 0]} rotation-x={Math.PI / 2}>
-        <torusGeometry args={[0.042, 0.0035, 10, 28]} />
-        <meshStandardMaterial color={palette.mugClay} roughness={0.7} />
+      <mesh position={[0, 0.095, 0]} rotation-x={Math.PI / 2} material={mats.claySolid}>
+        <torusGeometry args={[0.042, 0.0035, 8, segs]} />
       </mesh>
-      {/* Coffee surface, a little below the rim */}
-      <mesh position={[0, 0.078, 0]} rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[0.0405, 24]} />
-        <meshStandardMaterial color="#3d2417" roughness={0.25} />
+      <mesh position={[0, 0.078, 0]} rotation-x={-Math.PI / 2} material={mats.coffee}>
+        <circleGeometry args={[0.0405, segs]} />
       </mesh>
-      {/* C-handle: ends sunk into the cup wall */}
-      <mesh position={[0.033, 0.05, 0]} rotation-z={-Math.PI / 2}>
-        <torusGeometry args={[0.025, 0.006, 10, 20, Math.PI]} />
-        <meshStandardMaterial color={palette.mugClay} roughness={0.75} />
+      <mesh position={[0.033, 0.05, 0]} rotation-z={-Math.PI / 2} material={mats.claySolid}>
+        <torusGeometry args={[0.025, 0.006, 8, 16, Math.PI]} />
       </mesh>
-      <group ref={puffs}>
-        {Array.from({ length: N }).map((_, i) => (
-          <mesh key={i} position={[0, 0.11, 0]}>
-            <sphereGeometry args={[0.012, 10, 10]} />
-            <meshStandardMaterial color="#ffffff" transparent opacity={0} depthWrite={false} />
-          </mesh>
-        ))}
-      </group>
+      {props.quality.steam && (
+        <group ref={puffs}>
+          {Array.from({ length: N }).map((_, i) => (
+            <mesh key={i} position={[0, 0.11, 0]}>
+              <sphereGeometry args={[0.012, 8, 8]} />
+              <meshStandardMaterial color="#ffffff" transparent opacity={0} depthWrite={false} />
+            </mesh>
+          ))}
+        </group>
+      )}
     </group>
   )
 }
@@ -223,15 +190,14 @@ export function Mug(props: { position: [number, number, number] }) {
 /* Plant: low-poly foliage cluster rooted in its pot                   */
 /* ------------------------------------------------------------------ */
 
-export function Plant(props: { position: [number, number, number] }) {
+export function Plant(props: { position: [number, number, number]; quality: QualitySettings }) {
   const foliage = useRef<THREE.Group>(null)
 
   useFrame(({ clock }) => {
+    if (!props.quality.idleMotion || !foliage.current) return
     const t = clock.elapsedTime
-    if (foliage.current) {
-      foliage.current.rotation.z = Math.sin(t * 0.7) * 0.035
-      foliage.current.rotation.x = Math.cos(t * 0.53) * 0.025
-    }
+    foliage.current.rotation.z = Math.sin(t * 0.7) * 0.035
+    foliage.current.rotation.x = Math.cos(t * 0.53) * 0.025
   })
 
   const blobs = useMemo(
@@ -247,33 +213,22 @@ export function Plant(props: { position: [number, number, number] }) {
 
   return (
     <group position={props.position}>
-      {/* Pot */}
-      <mesh position={[0, 0.05, 0]} castShadow>
-        <cylinderGeometry args={[0.068, 0.052, 0.1, 18]} />
-        <meshStandardMaterial color={palette.potTerracotta} roughness={0.8} />
+      <mesh position={[0, 0.05, 0]} castShadow={props.quality.shadows} material={mats.terracotta}>
+        <cylinderGeometry args={[0.068, 0.052, 0.1, 12]} />
       </mesh>
-      <mesh position={[0, 0.1, 0]} rotation-x={Math.PI / 2}>
-        <torusGeometry args={[0.068, 0.006, 10, 22]} />
-        <meshStandardMaterial color={palette.potTerracotta} roughness={0.8} />
+      <mesh position={[0, 0.1, 0]} rotation-x={Math.PI / 2} material={mats.terracotta}>
+        <torusGeometry args={[0.068, 0.006, 8, 16]} />
       </mesh>
-      <mesh position={[0, 0.098, 0]} rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[0.06, 18]} />
-        <meshStandardMaterial color="#4a3826" roughness={1} />
+      <mesh position={[0, 0.098, 0]} rotation-x={-Math.PI / 2} material={mats.soil}>
+        <circleGeometry args={[0.06, 12]} />
       </mesh>
-      {/* Trunk + foliage */}
       <group ref={foliage}>
-        <mesh position={[0, 0.13, 0]} castShadow>
+        <mesh position={[0, 0.13, 0]} material={mats.trunk}>
           <cylinderGeometry args={[0.011, 0.014, 0.09, 8]} />
-          <meshStandardMaterial color="#7a5b3a" roughness={0.9} />
         </mesh>
         {blobs.map((b, i) => (
-          <mesh key={i} position={b.pos as [number, number, number]} castShadow>
+          <mesh key={i} position={b.pos as [number, number, number]} material={b.dark ? mats.plantDark : mats.plant}>
             <icosahedronGeometry args={[b.s, 0]} />
-            <meshStandardMaterial
-              color={b.dark ? palette.plantGreenDark : palette.plantGreen}
-              roughness={0.85}
-              flatShading
-            />
           </mesh>
         ))}
       </group>
@@ -285,7 +240,7 @@ export function Plant(props: { position: [number, number, number] }) {
 /* Books, notebook & pen (separated), phone with a live screen         */
 /* ------------------------------------------------------------------ */
 
-export function Books(props: { position: [number, number, number] }) {
+export function Books(props: { position: [number, number, number]; shadow: boolean }) {
   const books: Array<[string, number, number]> = [
     [palette.graphite, 0.3, 0],
     [palette.accent, 0.26, -0.18],
@@ -294,7 +249,7 @@ export function Books(props: { position: [number, number, number] }) {
   return (
     <group position={props.position}>
       {books.map(([color, w, rot], i) => (
-        <mesh key={i} position={[0, 0.017 + i * 0.034, 0]} rotation-y={rot} castShadow>
+        <mesh key={i} position={[0, 0.017 + i * 0.034, 0]} rotation-y={rot} castShadow={props.shadow}>
           <boxGeometry args={[w, 0.03, 0.2]} />
           <meshStandardMaterial color={color} roughness={0.85} />
         </mesh>
@@ -303,40 +258,32 @@ export function Books(props: { position: [number, number, number] }) {
   )
 }
 
-export function Notebook(props: { position: [number, number, number] }) {
+export function Notebook(props: { position: [number, number, number]; shadow: boolean }) {
   return (
     <group position={props.position} rotation-y={0.4}>
-      {/* Pad */}
-      <mesh position={[0, 0.006, 0]} castShadow>
+      <mesh position={[0, 0.006, 0]} castShadow={props.shadow} material={mats.cream}>
         <boxGeometry args={[0.16, 0.012, 0.21]} />
-        <meshStandardMaterial color={palette.cream} roughness={0.9} />
       </mesh>
-      {/* Cover stripe */}
-      <mesh position={[0, 0.0125, -0.085]}>
+      <mesh position={[0, 0.0125, -0.085]} material={mats.accent}>
         <boxGeometry args={[0.16, 0.002, 0.03]} />
-        <meshStandardMaterial color={palette.accent} roughness={0.6} />
       </mesh>
-      {/* Pen lying on the desk BESIDE the pad */}
       <group position={[0.13, 0.0045, 0.02]} rotation-y={-0.35}>
-        <mesh rotation-z={Math.PI / 2}>
+        <mesh rotation-z={Math.PI / 2} material={mats.accent}>
           <cylinderGeometry args={[0.0045, 0.0045, 0.125, 10]} />
-          <meshStandardMaterial color={palette.accent} roughness={0.4} />
         </mesh>
-        <mesh position={[0.069, 0, 0]} rotation-z={-Math.PI / 2}>
+        <mesh position={[0.069, 0, 0]} rotation-z={-Math.PI / 2} material={mats.graphite}>
           <coneGeometry args={[0.0045, 0.014, 10]} />
-          <meshStandardMaterial color={palette.graphite} roughness={0.4} />
         </mesh>
       </group>
     </group>
   )
 }
 
-export function Phone(props: { position: [number, number, number] }) {
+export function Phone(props: { position: [number, number, number]; quality: QualitySettings }) {
   const screen = useRef<THREE.MeshStandardMaterial>(null)
 
   useFrame(({ clock }) => {
-    if (!screen.current) return
-    // A notification arrives every ~6s: the screen lights up, then dims.
+    if (!props.quality.idleMotion || !screen.current) return
     const phase = (clock.elapsedTime % 6) / 1.4
     const pulse = phase < 1 ? Math.sin(phase * Math.PI) : 0
     screen.current.emissiveIntensity = 0.08 + pulse * 1.15
@@ -344,7 +291,7 @@ export function Phone(props: { position: [number, number, number] }) {
 
   return (
     <group position={props.position} rotation-y={-0.5}>
-      <RoundedBox args={[0.07, 0.008, 0.14]} radius={0.004} castShadow>
+      <RoundedBox args={[0.07, 0.008, 0.14]} radius={0.004} castShadow={props.quality.shadows}>
         <meshStandardMaterial color="#1c2126" roughness={0.3} metalness={0.3} />
       </RoundedBox>
       <mesh position={[0, 0.0045, 0]} rotation-x={-Math.PI / 2}>
@@ -359,7 +306,7 @@ export function Phone(props: { position: [number, number, number] }) {
 /* Architect's model: static block study on a wooden plinth            */
 /* ------------------------------------------------------------------ */
 
-export function ArchModel(props: { position: [number, number, number] }) {
+export function ArchModel(props: { position: [number, number, number]; shadow: boolean }) {
   const blocks = useMemo(() => {
     const rand = mulberry(3)
     const out: Array<{ x: number; z: number; h: number; accent: boolean }> = []
@@ -378,13 +325,10 @@ export function ArchModel(props: { position: [number, number, number] }) {
 
   return (
     <group position={props.position} rotation-y={0.5}>
-      <RoundedBox args={[0.19, 0.018, 0.19]} radius={0.006} position={[0, 0.009, 0]} castShadow>
-        <meshStandardMaterial color={palette.deskWoodDark} roughness={0.7} />
-      </RoundedBox>
+      <RoundedBox args={[0.19, 0.018, 0.19]} radius={0.006} position={[0, 0.009, 0]} castShadow={props.shadow} material={mats.woodDark} />
       {blocks.map((b, i) => (
-        <mesh key={i} position={[b.x, 0.018 + b.h / 2, b.z]} castShadow>
+        <mesh key={i} position={[b.x, 0.018 + b.h / 2, b.z]} castShadow={props.shadow} material={b.accent ? mats.accent : mats.cream}>
           <boxGeometry args={[0.032, b.h, 0.032]} />
-          <meshStandardMaterial color={b.accent ? palette.accent : palette.cream} roughness={0.7} flatShading />
         </mesh>
       ))}
     </group>
@@ -421,13 +365,13 @@ export function FloatingShapes() {
   return (
     <group ref={group}>
       {shapes.map((s, i) => (
-        <mesh key={i} position={s.pos as [number, number, number]} castShadow>
+        <mesh key={i} position={s.pos as [number, number, number]}>
           {s.kind === 'torus' ? (
-            <torusGeometry args={[s.s, s.s * 0.38, 10, 24]} />
+            <torusGeometry args={[s.s, s.s * 0.38, 10, 16]} />
           ) : s.kind === 'box' ? (
             <boxGeometry args={[s.s, s.s, s.s]} />
           ) : (
-            <sphereGeometry args={[s.s, 18, 18]} />
+            <sphereGeometry args={[s.s, 12, 12]} />
           )}
           <meshStandardMaterial color={s.color} roughness={0.55} flatShading={s.kind === 'sphere'} />
         </mesh>
@@ -440,15 +384,12 @@ export function FloatingShapes() {
 /* Ground                                                              */
 /* ------------------------------------------------------------------ */
 
-export function Ground() {
+export function Ground({ shadow }: { shadow: boolean }) {
   return (
     <group>
-      <RoundedBox args={[4.6, 0.14, 2.9]} radius={0.06} position={[0, -0.07, -0.1]} receiveShadow>
-        <meshStandardMaterial color={palette.platform} roughness={0.95} />
-      </RoundedBox>
-      <mesh position={[0, -0.145, 0]} rotation-x={-Math.PI / 2} receiveShadow>
-        <circleGeometry args={[14, 48]} />
-        <meshStandardMaterial color={palette.floor} roughness={1} />
+      <RoundedBox args={[4.6, 0.14, 2.9]} radius={0.06} position={[0, -0.07, -0.1]} receiveShadow={shadow} material={mats.platform} />
+      <mesh position={[0, -0.145, 0]} rotation-x={-Math.PI / 2} receiveShadow={shadow} material={mats.floor}>
+        <circleGeometry args={[14, 24]} />
       </mesh>
     </group>
   )

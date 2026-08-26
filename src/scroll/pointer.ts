@@ -1,3 +1,5 @@
+import { scrollEngine } from './engine'
+
 /**
  * Normalized pointer position (-1..1), shared by the parallax rig
  * and any DOM effect that wants it. Updated passively; consumers damp
@@ -15,6 +17,7 @@ export function attachPointer() {
     (e) => {
       pointer.x = (e.clientX / window.innerWidth) * 2 - 1
       pointer.y = (e.clientY / window.innerHeight) * 2 - 1
+      scrollEngine.notePointer()
     },
     { passive: true },
   )
