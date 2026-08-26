@@ -6,7 +6,7 @@ import { scrollEngine } from '../scroll/engine'
 import { BEATS } from '../scroll/choreography'
 import { sceneRefs } from './refs'
 
-const INSET = 0.99
+const INSET = 0.995
 const SIGNS: Array<[number, number]> = [
   [-1, -1],
   [1, -1],

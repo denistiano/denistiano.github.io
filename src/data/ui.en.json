@@ -10,5 +10,16 @@
     "downloadBG": "PDF — Bulgarian"
   },
   "langToggle": "БГ",
-  "loading": "Setting up the desk…"
+  "loading": "Setting up the desk…",
+  "bootHint": "When this is ready, one scroll takes you inside the laptop.",
+  "bootReady": "Ready — scroll to step inside",
+  "bootStages": [
+    "Clearing the desk",
+    "Placing the lamp",
+    "Warming the mug",
+    "Opening the laptop",
+    "Compiling the scene"
+  ],
+  "path": "Path",
+  "desk": "desk"
 }

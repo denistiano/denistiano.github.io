@@ -4,8 +4,9 @@ import { useScrollFrame } from '../scroll/useScrollFrame'
 import { BEATS, span, smoothstep } from '../scroll/choreography'
 import { sceneRefs } from '../scene/refs'
 import { scene as sceneCfg } from '../theme'
+import { scrollEngine } from '../scroll/engine'
 import { SECTION_NAV_KEYS, SECTION_ORDER } from './sections'
-import { activeSectionCached, cacheSectionOffsets } from './sectionCache'
+import { activeSectionCached, cacheSectionOffsets, setContentMaxScroll } from './sectionCache'
 import { About } from './chapters/About'
 import { Journey } from './chapters/Journey'
 import { Flagship } from './chapters/Flagship'
@@ -39,6 +40,7 @@ export function LaptopFrame({ onExtraScroll }: { onExtraScroll: (px: number) => 
       layout.current.boxH = boxH
       layout.current.maxScroll = Math.max(0, content.scrollHeight - boxH)
       cacheSectionOffsets(boxH)
+      setContentMaxScroll(layout.current.maxScroll)
       onExtraScroll(layout.current.maxScroll)
     }
     const ro = new ResizeObserver(report)
@@ -113,8 +115,10 @@ export function LaptopFrame({ onExtraScroll }: { onExtraScroll: (px: number) => 
   return (
     <div className="laptop-frame" ref={rootRef}>
       <div className="screen-chrome">
-        <span className="chrome-dots" aria-hidden="true">
-          <i /> <i /> <i />
+        <span className="chrome-dots">
+          <button type="button" className="chrome-dot close" aria-label="Back to start" onClick={() => scrollEngine.flyTo(0)} />
+          <button type="button" className="chrome-dot minimize" aria-label="Back to start" onClick={() => scrollEngine.flyTo(0)} />
+          <button type="button" className="chrome-dot zoom" aria-label="Back to start" onClick={() => scrollEngine.flyTo(0)} />
         </span>
         <span className="chrome-title">
           {cv.meta.name.toLowerCase().replace(' ', '.')} — portfolio

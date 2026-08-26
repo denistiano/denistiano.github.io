@@ -108,7 +108,7 @@ export function Hero() {
         <div className="hero-ctas" ref={ctaRef}>
           <button
             className="btn btn-primary"
-            onClick={() => scrollEngine.scrollToPx(scrollEngine.cinematicLength)}
+            onClick={() => scrollEngine.playCinematic()}
           >
             {cv.hero.ctaExplore}
           </button>

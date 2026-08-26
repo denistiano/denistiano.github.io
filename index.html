@@ -15,6 +15,36 @@
       content="I lead large-scale modernizations of systems others call impossible to migrate. Explore the interactive 3D CV or download the PDF."
     />
     <meta name="theme-color" content="#f1eee8" />
+    <style>
+      #boot-static {
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1eee8;
+        color: #181b1e;
+        font-family: system-ui, sans-serif;
+      }
+      .boot-static-card {
+        width: min(520px, calc(100% - 48px));
+      }
+      .boot-static-logo {
+        font-weight: 800;
+        font-size: 22px;
+        margin: 0 0 28px;
+      }
+      .boot-static-logo span {
+        color: #d97b29;
+      }
+      .boot-static-copy {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+        color: #d97b29;
+      }
+    </style>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23181b1e'/%3E%3Ctext x='32' y='42' font-family='sans-serif' font-weight='800' font-size='28' fill='%23f1eee8' text-anchor='middle'%3EDI%3C/text%3E%3Ccircle cx='50' cy='46' r='5' fill='%23d97b29'/%3E%3C/svg%3E" />
     <script type="application/ld+json">
       {
@@ -45,6 +75,12 @@
     </script>
   </head>
   <body>
+    <div id="boot-static">
+      <div class="boot-static-card">
+        <p class="boot-static-logo">DI<span>.</span></p>
+        <p class="boot-static-copy">Setting up the desk…</p>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

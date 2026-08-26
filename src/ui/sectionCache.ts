@@ -2,11 +2,24 @@ import type { SectionId } from './sections'
 import { SECTION_ORDER, sectionEls } from './sections'
 
 let offsets: number[] = []
+let maxScroll = 0
 
 /** Rebuild section offset cache — call on resize / language change. */
 export function cacheSectionOffsets(boxH: number) {
   void boxH
   offsets = SECTION_ORDER.map((id) => sectionEls[id]?.offsetTop ?? 0)
+}
+
+export function setContentMaxScroll(px: number) {
+  maxScroll = px
+}
+
+export function getSectionOffsets() {
+  return offsets
+}
+
+export function getContentMaxScroll() {
+  return maxScroll
 }
 
 /** Which section owns the given content scroll offset (cached offsets). */

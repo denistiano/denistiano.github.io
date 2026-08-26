@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef } from 'react'
-import { Canvas, invalidate, useFrame } from '@react-three/fiber'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { Canvas, invalidate, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { palette, scene as sceneCfg } from '../theme'
 import type { QualitySettings } from '../quality'
@@ -12,13 +12,13 @@ import {
   Books,
   Chair,
   Desk,
-  FloatingShapes,
   Ground,
   Lamp,
   Mug,
   Notebook,
   Phone,
   Plant,
+  WallClock,
 } from './Props'
 import { Dust } from './Dust'
 
@@ -58,6 +58,58 @@ function KeyLight({ quality }: { quality: QualitySettings }) {
   )
 }
 
+function Warmup({ onReady }: { onReady: () => void }) {
+  const { gl, scene, camera } = useThree()
+  const phase = useRef(0)
+  const flushes = useRef(0)
+  const sent = useRef(false)
+
+  useEffect(() => {
+    let live = true
+    const finish = () => {
+      if (!live) return
+      phase.current = 1
+      invalidate()
+    }
+    const run = async () => {
+      try {
+        const asyncCompile = (
+          gl as THREE.WebGLRenderer & {
+            compileAsync?: (s: THREE.Scene, c: THREE.Camera) => Promise<void>
+          }
+        ).compileAsync
+        if (asyncCompile) await asyncCompile.call(gl, scene, camera)
+        else gl.compile(scene, camera)
+      } catch {
+        /* compile is best-effort — still flush a couple of frames */
+      }
+      finish()
+    }
+    void run()
+    invalidate()
+    return () => {
+      live = false
+    }
+  }, [gl, scene, camera])
+
+  useFrame(() => {
+    if (sent.current) return
+    if (phase.current === 0) {
+      invalidate()
+      return
+    }
+    flushes.current++
+    if (flushes.current < 2) {
+      invalidate()
+      return
+    }
+    sent.current = true
+    onReady()
+  })
+
+  return null
+}
+
 function DeskWorld({ quality }: { quality: QualitySettings }) {
   const shadow = quality.shadows
   return (
@@ -74,7 +126,7 @@ function DeskWorld({ quality }: { quality: QualitySettings }) {
         <Notebook position={[0.34, 0.75, 0.37]} shadow={shadow} />
         <Phone position={[-0.58, 0.755, 0.3]} quality={quality} />
         <ArchModel position={[-0.72, 0.75, 0.05]} shadow={shadow} />
-        {quality.floatingShapes && <FloatingShapes />}
+        <WallClock position={[-0.18, 1.48, -1.28]} />
         {quality.dust > 0 && <Dust count={quality.dust} />}
       </group>
       <CameraRig />
@@ -83,9 +135,15 @@ function DeskWorld({ quality }: { quality: QualitySettings }) {
   )
 }
 
-export function SceneRoot({ quality, live }: { quality: QualitySettings; live: boolean }) {
+export function SceneRoot({
+  quality,
+  onReady,
+}: {
+  quality: QualitySettings
+  onReady: () => void
+}) {
   return (
-    <div className={live ? 'scene-canvas' : 'scene-canvas is-idle'} aria-hidden="true">
+    <div className="scene-canvas" aria-hidden="true">
       <Canvas
         shadows={quality.shadows}
         frameloop="demand"
@@ -101,7 +159,7 @@ export function SceneRoot({ quality, live }: { quality: QualitySettings; live: b
           scene.background = new THREE.Color(palette.bg)
           scene.fog = new THREE.Fog(palette.bg, 7, 18)
           gl.setClearColor(palette.bg, 1)
-          if (live) invalidate()
+          invalidate()
         }}
       >
         <hemisphereLight args={['#ffffff', palette.floor, 0.75]} />
@@ -109,6 +167,7 @@ export function SceneRoot({ quality, live }: { quality: QualitySettings; live: b
         <directionalLight position={[-2.5, 3, -2]} intensity={0.3} color="#dfe8f2" />
 
         <DeskWorld quality={quality} />
+        <Warmup onReady={onReady} />
       </Canvas>
     </div>
   )

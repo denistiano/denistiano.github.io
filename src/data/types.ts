@@ -125,6 +125,11 @@ export interface UIStrings {
   }
   langToggle: string
   loading: string
+  bootHint: string
+  bootReady: string
+  bootStages: string[]
+  path: string
+  desk: string
 }
 
 export type Lang = 'en' | 'bg'

@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { palette, scene as sceneCfg, SCREEN_H, SCREEN_W } from '../theme'
+import { palette, scene as sceneCfg, LID_H, LID_W } from '../theme'
 import { scrollEngine } from '../scroll/engine'
 import { pointer } from '../scroll/pointer'
 import { BEATS, span, smoothstep, lerp } from '../scroll/choreography'
@@ -17,9 +17,9 @@ interface Key {
  * One continuous camera take, keyframed over cinematic progress.
  * The final act flies to the live world pose of the laptop screen
  * anchor and SETTLES there: the closeup of the screen is the end of
- * the journey, we never leave the scene. The settle distance is
- * computed from the fov/aspect so the screen fills the viewport the
- * same way on every display.
+ * the journey, we never leave the scene. Distance is computed so the
+ * whole lid fits in the viewport — the 3D bezel stays visible around
+ * the DOM glass.
  */
 export function CameraRig() {
   const { camera, scene } = useThree()
@@ -67,11 +67,12 @@ export function CameraRig() {
         anchor.getWorldDirection(anchorDir) // +z = out of the screen
       }
       const zoom = smoothstep(span(p, BEATS.zoomStart, BEATS.zoomEnd))
-      // Distance where the screen fills the configured viewport share.
       const persp = camera as THREE.PerspectiveCamera
       const halfV = Math.tan((persp.fov * Math.PI) / 360)
-      const dH = SCREEN_H / 2 / (halfV * sceneCfg.screenFillH)
-      const dW = SCREEN_W / 2 / (halfV * persp.aspect * sceneCfg.screenFillW)
+      // Fit the whole LID in the viewport (max of the two axes) so the
+      // 3D bezel stays on-screen around the DOM overlay.
+      const dH = LID_H / 2 / (halfV * sceneCfg.screenFillH)
+      const dW = LID_W / 2 / (halfV * persp.aspect * sceneCfg.screenFillW)
       const dist = Math.max(dH, dW)
 
       const lastKey = keys[keys.length - 1]

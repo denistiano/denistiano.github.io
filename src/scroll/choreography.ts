@@ -1,12 +1,10 @@
 /**
  * The experience has two acts:
  *
- *  1. CINEMATIC (first `scene.cinematicPages` viewport-heights of scroll):
- *     a single continuous camera take driven by normalized progress
- *     (0 -> 1). Every beat below is a slice of that value.
- *  2. CONTENT: once the camera has settled on a closeup of the laptop
- *     screen, scrolling becomes completely normal — the remaining scroll
- *     distance translates the content inside the screen 1:1.
+ *  1. CINEMATIC: one downward gesture plays a locked, timed camera take
+ *     (progress 0 -> 1). Wheel intensity cannot skip or scrub it.
+ *  2. CONTENT: after the camera settles on the laptop screen, scrolling
+ *     is normal — remaining distance translates the CV inside the screen.
  */
 
 export const clamp01 = (x: number) => Math.min(1, Math.max(0, x))

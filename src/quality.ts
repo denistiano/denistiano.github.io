@@ -1,5 +1,3 @@
-import { BEATS } from './scroll/choreography'
-
 export type QualityTier = 'high' | 'medium' | 'low'
 
 export interface QualitySettings {
@@ -9,7 +7,6 @@ export interface QualitySettings {
   shadowMapSize: number
   antialias: boolean
   dust: number
-  floatingShapes: boolean
   pointLights: boolean
   steam: boolean
   idleMotion: boolean
@@ -24,7 +21,6 @@ const HIGH: QualitySettings = {
   shadowMapSize: 1024,
   antialias: true,
   dust: 40,
-  floatingShapes: true,
   pointLights: true,
   steam: true,
   idleMotion: true,
@@ -39,7 +35,6 @@ const MEDIUM: QualitySettings = {
   shadowMapSize: 512,
   antialias: false,
   dust: 20,
-  floatingShapes: false,
   pointLights: false,
   steam: false,
   idleMotion: true,
@@ -54,7 +49,6 @@ const LOW: QualitySettings = {
   shadowMapSize: 512,
   antialias: false,
   dust: 0,
-  floatingShapes: false,
   pointLights: false,
   steam: false,
   idleMotion: false,
@@ -91,9 +85,4 @@ export function detectQuality(): QualitySettings {
     return MEDIUM
   }
   return HIGH
-}
-
-/** Progress at which the 3D canvas is fully covered and can sleep. */
-export function canvasHideProgress(viewportW = window.innerWidth) {
-  return viewportW < 900 ? BEATS.screenEnterStart : BEATS.screenEnterEnd
 }

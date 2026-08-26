@@ -1,5 +1,5 @@
-import { useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useEffect, useMemo, useRef } from 'react'
+import { invalidate, useFrame } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { palette } from '../theme'
@@ -336,46 +336,84 @@ export function ArchModel(props: { position: [number, number, number]; shadow: b
 }
 
 /* ------------------------------------------------------------------ */
-/* Floating accent shapes                                              */
+/* Wall clock — hangs in the air behind the desk, real local time      */
 /* ------------------------------------------------------------------ */
 
-export function FloatingShapes() {
-  const group = useRef<THREE.Group>(null)
+const TICKS = Array.from({ length: 12 }, (_, i) => (i * Math.PI) / 6)
 
-  const shapes = useMemo(
-    () => [
-      { pos: [1.9, 1.95, -0.7], kind: 'torus', color: palette.accent, s: 0.09 },
-      { pos: [-1.55, 1.45, -1.1], kind: 'box', color: palette.graphite, s: 0.09 },
-      { pos: [1.5, 1.2, 0.8], kind: 'sphere', color: palette.accent, s: 0.055 },
-      { pos: [-1.9, 2.0, -0.4], kind: 'sphere', color: palette.metal, s: 0.05 },
-      { pos: [0.8, 2.3, -1.2], kind: 'torus', color: palette.metal, s: 0.07 },
-    ],
-    [],
-  )
+export function WallClock(props: { position: [number, number, number] }) {
+  const hour = useRef<THREE.Group>(null)
+  const minute = useRef<THREE.Group>(null)
+  const second = useRef<THREE.Group>(null)
 
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime
-    group.current?.children.forEach((c, i) => {
-      c.position.y = (shapes[i].pos[1] as number) + Math.sin(t * 0.6 + i * 2.1) * 0.06
-      c.rotation.x = t * 0.2 + i
-      c.rotation.y = t * 0.26 + i * 0.7
-    })
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (document.hidden) return
+      if (scrollEngine.state.progress < BEATS.zoomStart) invalidate()
+    }, 250)
+    return () => window.clearInterval(id)
+  }, [])
+
+  useFrame(() => {
+    const now = new Date()
+    const s = now.getSeconds() + now.getMilliseconds() / 1000
+    const m = now.getMinutes() + s / 60
+    const h = (now.getHours() % 12) + m / 60
+    if (hour.current) hour.current.rotation.z = -h * (Math.PI / 6)
+    if (minute.current) minute.current.rotation.z = -m * (Math.PI / 30)
+    if (second.current) second.current.rotation.z = -s * (Math.PI / 30)
   })
 
   return (
-    <group ref={group}>
-      {shapes.map((s, i) => (
-        <mesh key={i} position={s.pos as [number, number, number]}>
-          {s.kind === 'torus' ? (
-            <torusGeometry args={[s.s, s.s * 0.38, 10, 16]} />
-          ) : s.kind === 'box' ? (
-            <boxGeometry args={[s.s, s.s, s.s]} />
-          ) : (
-            <sphereGeometry args={[s.s, 12, 12]} />
-          )}
-          <meshStandardMaterial color={s.color} roughness={0.55} flatShading={s.kind === 'sphere'} />
+    <group position={props.position}>
+      <mesh position={[0, 0.22, -0.006]} material={mats.metal}>
+        <cylinderGeometry args={[0.006, 0.006, 0.08, 8]} />
+      </mesh>
+      <mesh position={[0, 0.265, 0]} material={mats.graphite}>
+        <boxGeometry args={[0.028, 0.012, 0.016]} />
+      </mesh>
+
+      <mesh position={[0, 0, -0.012]} rotation-x={Math.PI / 2} material={mats.metal}>
+        <cylinderGeometry args={[0.175, 0.175, 0.022, 28]} />
+      </mesh>
+      <mesh position={[0, 0, 0.002]} material={mats.cream}>
+        <circleGeometry args={[0.158, 28]} />
+      </mesh>
+
+      {TICKS.map((a, i) => {
+        const major = i % 3 === 0
+        const len = major ? 0.028 : 0.016
+        const r = 0.138
+        return (
+          <mesh
+            key={i}
+            position={[Math.sin(a) * r, Math.cos(a) * r, 0.004]}
+            rotation-z={-a}
+            material={major ? mats.graphite : mats.graphiteDull}
+          >
+            <boxGeometry args={[major ? 0.01 : 0.006, len, 0.004]} />
+          </mesh>
+        )
+      })}
+
+      <group ref={hour}>
+        <mesh position={[0, 0.042, 0.01]} material={mats.graphite}>
+          <boxGeometry args={[0.016, 0.084, 0.006]} />
         </mesh>
-      ))}
+      </group>
+      <group ref={minute}>
+        <mesh position={[0, 0.058, 0.014]} material={mats.graphiteDull}>
+          <boxGeometry args={[0.01, 0.116, 0.005]} />
+        </mesh>
+      </group>
+      <group ref={second}>
+        <mesh position={[0, 0.05, 0.018]} material={mats.accent}>
+          <boxGeometry args={[0.004, 0.12, 0.003]} />
+        </mesh>
+      </group>
+      <mesh position={[0, 0, 0.022]} material={mats.metal}>
+        <sphereGeometry args={[0.012, 12, 8]} />
+      </mesh>
     </group>
   )
 }

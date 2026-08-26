@@ -1,7 +1,6 @@
 import Lenis from 'lenis'
 import { invalidate } from '@react-three/fiber'
 import { scene as sceneCfg } from '../theme'
-import { canvasHideProgress } from '../quality'
 
 export interface ScrollState {
   /** Smoothed scroll position in px, straight from Lenis. */
@@ -19,14 +18,18 @@ export interface ScrollState {
 }
 
 type Subscriber = (state: ScrollState, dt: number) => void
+type Phase = 'intro' | 'playing' | 'content'
+
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
 /**
  * Own rAF, independent of the WebGL canvas.
  *
- * Lenis with `autoRaf: false` must be ticked every frame — wheel events
- * only queue a target; `lenis.raf()` is what actually moves the page.
- * WebGL stays on `frameloop="demand"` and is `invalidate()`-d only while
- * the cinematic is on screen.
+ * Intro: one downward gesture plays the full cinematic on a locked
+ * timeline (wheel intensity cannot skip it). After that, Lenis is
+ * normal scrolling inside the laptop. WebGL is `invalidate()`-d while
+ * the camera is moving; the last frame stays visible behind the CV.
  */
 class ScrollEngine {
   readonly state: ScrollState = {
@@ -38,20 +41,55 @@ class ScrollEngine {
     total: 0,
   }
   cinematicLength = sceneCfg.cinematicPages * (typeof window !== 'undefined' ? window.innerHeight : 800)
-  /** When false the 3D view is covered — skip invalidate(). */
-  sceneLive = true
+  private phase: Phase = 'intro'
   private lenis: Lenis | null = null
   private subscribers = new Set<Subscriber>()
   private lastTime = -1
   private smoothTime = 0.42
   private rafId = 0
+  private afterPlay: (() => void) | null = null
+  /** Last user scroll/key time — reverse only after a pause at the top. */
+  private lastInput = 0
+  /** Cinematic stays locked until the boot screen arms the engine. */
+  private armed = false
+
   private onResize = () => {
     this.cinematicLength = sceneCfg.cinematicPages * window.innerHeight
-    if (this.sceneLive) invalidate()
+    invalidate()
   }
+
   private onVisibility = () => {
     if (document.hidden) this.cancel()
     else this.loop()
+  }
+
+  private onKeyDown = (e: KeyboardEvent) => {
+    if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return
+    const tag = (e.target as HTMLElement | null)?.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+
+    const down = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ' || e.key === 'Spacebar'
+    const up = e.key === 'ArrowUp' || e.key === 'PageUp'
+
+    if (this.phase === 'playing') {
+      if (down || up) e.preventDefault()
+      return
+    }
+    if (!this.armed) {
+      if (down || up) e.preventDefault()
+      return
+    }
+    if (this.phase === 'intro' && down) {
+      e.preventDefault()
+      this.playCinematic()
+      return
+    }
+    if (this.phase === 'content' && up && this.atContentStart() && this.reverseReady()) {
+      e.preventDefault()
+      this.playReverse()
+      return
+    }
+    this.lastInput = performance.now()
   }
 
   start(smoothTime: number) {
@@ -60,11 +98,14 @@ class ScrollEngine {
     this.onResize()
     window.addEventListener('resize', this.onResize)
     document.addEventListener('visibilitychange', this.onVisibility)
+    window.addEventListener('keydown', this.onKeyDown, { passive: false })
     this.lenis = new Lenis({
       duration: 1.1,
       smoothWheel: true,
+      syncTouch: true,
       touchMultiplier: 1.4,
       autoRaf: false,
+      virtualScroll: this.onVirtualScroll,
     })
     this.loop()
   }
@@ -72,10 +113,20 @@ class ScrollEngine {
   stop() {
     window.removeEventListener('resize', this.onResize)
     document.removeEventListener('visibilitychange', this.onVisibility)
+    window.removeEventListener('keydown', this.onKeyDown)
     this.cancel()
     this.lenis?.destroy()
     this.lenis = null
     this.lastTime = -1
+    this.phase = 'intro'
+    this.afterPlay = null
+    this.lastInput = 0
+    this.armed = false
+  }
+
+  /** Allow the first cinematic once the scene has finished booting. */
+  arm() {
+    this.armed = true
   }
 
   subscribe(cb: Subscriber) {
@@ -85,8 +136,59 @@ class ScrollEngine {
     }
   }
 
+  /** Play the landing cinematic, then optionally continue to a content offset. */
+  playCinematic(then?: () => void) {
+    if (!this.armed) return
+    if (this.phase === 'playing') {
+      if (then) this.afterPlay = then
+      return
+    }
+    if (this.phase === 'content') {
+      then?.()
+      return
+    }
+    const lenis = this.lenis
+    if (!lenis) return
+    this.phase = 'playing'
+    this.afterPlay = then ?? null
+    this.lastInput = performance.now()
+    lenis.scrollTo(this.cinematicLength, {
+      duration: sceneCfg.cinematicDuration,
+      easing: easeInOutCubic,
+      lock: true,
+      programmatic: true,
+      onComplete: this.finishPlay,
+    })
+  }
+
+  /** Reverse the cinematic back to the landing. */
+  playReverse() {
+    if (this.phase === 'playing' || this.phase === 'intro') return
+    const lenis = this.lenis
+    if (!lenis) return
+    this.phase = 'playing'
+    this.afterPlay = null
+    this.lastInput = performance.now()
+    lenis.scrollTo(0, {
+      duration: sceneCfg.cinematicDuration,
+      easing: easeInOutCubic,
+      lock: true,
+      programmatic: true,
+      onComplete: () => {
+        this.phase = 'intro'
+        this.snapProgress()
+        invalidate()
+      },
+    })
+  }
+
   /** Animated scroll to an absolute pixel position (nav shortcuts). */
   scrollToPx(px: number) {
+    if (!this.armed) return
+    if (px >= this.cinematicLength - 1 && this.phase !== 'content') {
+      this.playCinematic(() => this.scrollToPx(px))
+      return
+    }
     const lenis = this.lenis
     if (!lenis) return
     const distance = Math.abs(px - lenis.scroll) / Math.max(1, window.innerHeight)
@@ -99,16 +201,73 @@ class ScrollEngine {
 
   /** Fly to a cinematic progress position (0-1). */
   flyTo(progress: number) {
+    if (!this.armed) return
+    if (progress <= 0) {
+      if (this.phase === 'intro') return
+      const lenis = this.lenis
+      if (this.phase === 'content' && !this.atContentStart() && lenis) {
+        lenis.scrollTo(0, { immediate: true })
+        this.phase = 'intro'
+        this.snapProgress()
+        invalidate()
+        return
+      }
+      this.playReverse()
+      return
+    }
+    if (progress >= 1) {
+      this.playCinematic()
+      return
+    }
     this.scrollToPx(progress * this.cinematicLength)
   }
 
-  /** Pointer parallax: one demand frame while the 3D act is visible. */
   notePointer() {
-    if (!this.sceneLive || document.hidden) return
-    const s = this.state
-    const hideAt = canvasHideProgress()
-    if (s.progress >= hideAt && s.target >= hideAt) return
+    if (document.hidden) return
+    if (this.state.progress >= 1 && this.state.target >= 1 && this.phase === 'content') return
     invalidate()
+  }
+
+  private onVirtualScroll = ({ deltaY }: { deltaY: number }) => {
+    if (!this.armed || this.phase === 'playing') return true
+    if (this.phase === 'intro') {
+      if (deltaY > 0.5) this.playCinematic()
+      return true
+    }
+    const now = performance.now()
+    if (deltaY < -0.5 && this.atContentStart()) {
+      if (now - this.lastInput > 420) this.playReverse()
+      this.lastInput = now
+      return true
+    }
+    this.lastInput = now
+    return true
+  }
+
+  private finishPlay = () => {
+    this.phase = 'content'
+    this.lastInput = performance.now()
+    this.snapProgress()
+    invalidate()
+    const next = this.afterPlay
+    this.afterPlay = null
+    next?.()
+  }
+
+  private atContentStart() {
+    const lenis = this.lenis
+    if (!lenis) return false
+    return lenis.scroll <= this.cinematicLength + 4
+  }
+
+  private reverseReady() {
+    return performance.now() - this.lastInput > 420
+  }
+
+  private snapProgress() {
+    const s = this.state
+    s.progress = s.target
+    s.velocity = 0
   }
 
   private loop() {
@@ -129,6 +288,10 @@ class ScrollEngine {
 
     lenis.raf(time)
 
+    if (this.phase === 'content' && lenis.scroll < this.cinematicLength) {
+      lenis.scrollTo(this.cinematicLength, { immediate: true })
+    }
+
     const s = this.state
     s.scroll = lenis.scroll
     s.target = clamp01(lenis.scroll / this.cinematicLength)
@@ -142,20 +305,15 @@ class ScrollEngine {
     this.damp(dt)
     for (const cb of this.subscribers) cb(s, dt)
 
-    if (this.sceneLive) {
-      const hideAt = canvasHideProgress()
-      const cinematic =
-        s.progress < hideAt ||
-        s.target < hideAt ||
-        Math.abs(s.velocity) > 1e-4 ||
-        Math.abs(s.progress - s.target) > 1e-4
-      if (cinematic) invalidate()
-    }
+    const moving =
+      this.phase === 'playing' ||
+      Math.abs(s.velocity) > 1e-4 ||
+      Math.abs(s.progress - s.target) > 1e-4
+    if (moving) invalidate()
 
     this.loop()
   }
 
-  /** Critically damped spring (Unity SmoothDamp) — interruptible, no overshoot. */
   private damp(dt: number) {
     const s = this.state
     const omega = 2 / this.smoothTime

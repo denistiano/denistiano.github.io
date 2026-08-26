@@ -36,11 +36,17 @@ export const scene = {
   parallaxSmoothTime: 0.6,
   /** Length of the cinematic act in viewport heights. Content scroll is appended after it. */
   cinematicPages: 5,
-  /** How much of the viewport height the laptop screen fills in the final closeup. */
+  /** Timed play-through of the cinematic after one scroll gesture (seconds). */
+  cinematicDuration: 5.4,
+  /** How much of the viewport the laptop LID fills in the final closeup.
+      Sized so the physical bezel stays on-screen around the glass. */
   screenFillH: 0.86,
-  screenFillW: 0.94,
+  screenFillW: 0.9,
 } as const
 
 /** World-space size of the laptop screen plane (must match Laptop.tsx). */
 export const SCREEN_W = 0.55
 export const SCREEN_H = 0.365
+/** Lid shell — slightly larger than the glass, used to frame the closeup. */
+export const LID_W = 0.6
+export const LID_H = 0.42
