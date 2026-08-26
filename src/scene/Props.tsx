@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react'
-import { invalidate, useFrame } from '@react-three/fiber'
+import { useMemo, useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { palette } from '../theme'
@@ -331,89 +331,6 @@ export function ArchModel(props: { position: [number, number, number]; shadow: b
           <boxGeometry args={[0.032, b.h, 0.032]} />
         </mesh>
       ))}
-    </group>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/* Wall clock — hangs in the air behind the desk, real local time      */
-/* ------------------------------------------------------------------ */
-
-const TICKS = Array.from({ length: 12 }, (_, i) => (i * Math.PI) / 6)
-
-export function WallClock(props: { position: [number, number, number] }) {
-  const hour = useRef<THREE.Group>(null)
-  const minute = useRef<THREE.Group>(null)
-  const second = useRef<THREE.Group>(null)
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      if (document.hidden) return
-      if (scrollEngine.state.progress < BEATS.zoomStart) invalidate()
-    }, 250)
-    return () => window.clearInterval(id)
-  }, [])
-
-  useFrame(() => {
-    const now = new Date()
-    const s = now.getSeconds() + now.getMilliseconds() / 1000
-    const m = now.getMinutes() + s / 60
-    const h = (now.getHours() % 12) + m / 60
-    if (hour.current) hour.current.rotation.z = -h * (Math.PI / 6)
-    if (minute.current) minute.current.rotation.z = -m * (Math.PI / 30)
-    if (second.current) second.current.rotation.z = -s * (Math.PI / 30)
-  })
-
-  return (
-    <group position={props.position}>
-      <mesh position={[0, 0.22, -0.006]} material={mats.metal}>
-        <cylinderGeometry args={[0.006, 0.006, 0.08, 8]} />
-      </mesh>
-      <mesh position={[0, 0.265, 0]} material={mats.graphite}>
-        <boxGeometry args={[0.028, 0.012, 0.016]} />
-      </mesh>
-
-      <mesh position={[0, 0, -0.012]} rotation-x={Math.PI / 2} material={mats.metal}>
-        <cylinderGeometry args={[0.175, 0.175, 0.022, 28]} />
-      </mesh>
-      <mesh position={[0, 0, 0.002]} material={mats.cream}>
-        <circleGeometry args={[0.158, 28]} />
-      </mesh>
-
-      {TICKS.map((a, i) => {
-        const major = i % 3 === 0
-        const len = major ? 0.028 : 0.016
-        const r = 0.138
-        return (
-          <mesh
-            key={i}
-            position={[Math.sin(a) * r, Math.cos(a) * r, 0.004]}
-            rotation-z={-a}
-            material={major ? mats.graphite : mats.graphiteDull}
-          >
-            <boxGeometry args={[major ? 0.01 : 0.006, len, 0.004]} />
-          </mesh>
-        )
-      })}
-
-      <group ref={hour}>
-        <mesh position={[0, 0.042, 0.01]} material={mats.graphite}>
-          <boxGeometry args={[0.016, 0.084, 0.006]} />
-        </mesh>
-      </group>
-      <group ref={minute}>
-        <mesh position={[0, 0.058, 0.014]} material={mats.graphiteDull}>
-          <boxGeometry args={[0.01, 0.116, 0.005]} />
-        </mesh>
-      </group>
-      <group ref={second}>
-        <mesh position={[0, 0.05, 0.018]} material={mats.accent}>
-          <boxGeometry args={[0.004, 0.12, 0.003]} />
-        </mesh>
-      </group>
-      <mesh position={[0, 0, 0.022]} material={mats.metal}>
-        <sphereGeometry args={[0.012, 12, 8]} />
-      </mesh>
     </group>
   )
 }
