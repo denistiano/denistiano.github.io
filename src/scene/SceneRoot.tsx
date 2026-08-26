@@ -88,7 +88,7 @@ export function SceneRoot({ quality, live }: { quality: QualitySettings; live: b
     <div className={live ? 'scene-canvas' : 'scene-canvas is-idle'} aria-hidden="true">
       <Canvas
         shadows={quality.shadows}
-        frameloop={live ? 'demand' : 'never'}
+        frameloop="demand"
         dpr={quality.dpr}
         gl={{
           antialias: quality.antialias,

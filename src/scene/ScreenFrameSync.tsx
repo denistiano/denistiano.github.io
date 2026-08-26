@@ -29,8 +29,7 @@ export function ScreenFrameSync() {
     const anchor = sceneRefs.screenAnchor
     const el = sceneRefs.frameEl
     if (!anchor || !el) return
-    const p = scrollEngine.state.progress
-    if (p < BEATS.zoomStart || p >= BEATS.zoomEnd) return
+    if (scrollEngine.state.progress < BEATS.zoomStart) return
     // Phones keep the CSS fullscreen layout instead of the projection.
     if (size.width < 900) return
 

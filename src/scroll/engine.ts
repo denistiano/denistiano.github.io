@@ -23,10 +23,10 @@ type Subscriber = (state: ScrollState, dt: number) => void
 /**
  * Own rAF, independent of the WebGL canvas.
  *
- * DOM subscribers (hero, laptop frame, rail) keep working during the
- * content act without forcing a 3D render. The canvas is on
- * `frameloop="demand"` and is only `invalidate()`-d while the cinematic
- * is still on screen.
+ * Lenis with `autoRaf: false` must be ticked every frame — wheel events
+ * only queue a target; `lenis.raf()` is what actually moves the page.
+ * WebGL stays on `frameloop="demand"` and is `invalidate()`-d only while
+ * the cinematic is on screen.
  */
 class ScrollEngine {
   readonly state: ScrollState = {
@@ -48,11 +48,10 @@ class ScrollEngine {
   private onResize = () => {
     this.cinematicLength = sceneCfg.cinematicPages * window.innerHeight
     if (this.sceneLive) invalidate()
-    this.schedule()
   }
   private onVisibility = () => {
     if (document.hidden) this.cancel()
-    else this.schedule()
+    else this.loop()
   }
 
   start(smoothTime: number) {
@@ -67,8 +66,7 @@ class ScrollEngine {
       touchMultiplier: 1.4,
       autoRaf: false,
     })
-    this.lenis.on('scroll', this.schedule)
-    this.schedule()
+    this.loop()
   }
 
   stop() {
@@ -97,7 +95,6 @@ class ScrollEngine {
       easing: (t: number) => 1 - Math.pow(1 - t, 3),
       lock: true,
     })
-    this.schedule()
   }
 
   /** Fly to a cinematic progress position (0-1). */
@@ -114,7 +111,7 @@ class ScrollEngine {
     invalidate()
   }
 
-  schedule = () => {
+  private loop() {
     if (this.rafId || document.hidden || !this.lenis) return
     this.rafId = requestAnimationFrame(this.tick)
   }
@@ -145,17 +142,17 @@ class ScrollEngine {
     this.damp(dt)
     for (const cb of this.subscribers) cb(s, dt)
 
-    const moving =
-      Math.abs(s.velocity) > 1e-4 ||
-      Math.abs(s.progress - s.target) > 1e-4 ||
-      Math.abs(lenis.velocity) > 0.02
-
-    if (this.sceneLive && moving) {
+    if (this.sceneLive) {
       const hideAt = canvasHideProgress()
-      if (s.progress < hideAt || s.target < hideAt) invalidate()
+      const cinematic =
+        s.progress < hideAt ||
+        s.target < hideAt ||
+        Math.abs(s.velocity) > 1e-4 ||
+        Math.abs(s.progress - s.target) > 1e-4
+      if (cinematic) invalidate()
     }
 
-    if (moving) this.schedule()
+    this.loop()
   }
 
   /** Critically damped spring (Unity SmoothDamp) — interruptible, no overshoot. */
