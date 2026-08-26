@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "about": "За мен",
+    "journey": "Път",
+    "caseStudy": "Ключов проект",
+    "skills": "Умения",
+    "contact": "Контакт",
+    "downloadCV": "Свали CV",
+    "downloadEN": "PDF — Английски",
+    "downloadBG": "PDF — Български"
+  },
+  "langToggle": "EN",
+  "loading": "Подреждаме бюрото…"
+}

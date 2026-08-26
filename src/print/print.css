@@ -1,0 +1,372 @@
+/* ------------------------------------------------------------------ */
+/* Executive A4 CV — dark left rail + main career narrative            */
+/* The rail spans the full document height; Chrome repaints fragment   */
+/* backgrounds on every page, so the template carries across pages.    */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --p-ink: #1b1e21;
+  --p-soft: #61676d;
+  --p-accent: #c96b1d;
+  --p-accent-bright: #e08a3c;
+  --p-line: #d8d3ca;
+  --p-paper: #ffffff;
+  --p-rail: #21272e;
+  --p-rail-line: #39414b;
+  --p-rail-text: #e8e6e1;
+  --p-rail-soft: #9aa3ac;
+}
+
+html.print-mode,
+html.print-mode body {
+  background: #565b60;
+}
+
+@media print {
+  html.print-mode,
+  html.print-mode body {
+    background: #fff;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+.print-doc {
+  width: 210mm;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 62mm 1fr;
+  background: var(--p-paper);
+  color: var(--p-ink);
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-size: 9pt;
+  line-height: 1.45;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+@media screen {
+  .print-doc {
+    margin: 24px auto;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 0.4);
+  }
+}
+
+/* --- dark rail --------------------------------------------------------- */
+
+.p-rail-bg {
+  display: none;
+}
+
+@media print {
+  .p-rail-bg {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 62mm;
+    height: 100vh;
+    background: var(--p-rail);
+  }
+}
+
+.p-side {
+  /* Positioned so it paints ABOVE the fixed .p-rail-bg layer. */
+  position: relative;
+  background: var(--p-rail);
+  color: var(--p-rail-text);
+  padding: 13mm 7mm 13mm 9mm;
+}
+
+.p-avatar {
+  width: 36mm;
+  height: 36mm;
+  border-radius: 50%;
+  border: 0.8mm solid var(--p-accent);
+  padding: 1.1mm;
+  margin: 0 auto;
+}
+
+.p-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Face centered, sitting slightly above the middle of the circle. */
+  object-position: 50% 44%;
+}
+
+/* Top spacing lives in padding, not margin: margins are discarded at
+   page breaks, padding keeps text off the page edge. */
+.p-side-section {
+  padding-top: 7mm;
+  break-inside: avoid;
+}
+
+.p-side-section h2 {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 8.6pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--p-accent-bright);
+  padding-bottom: 1.6mm;
+  border-bottom: 1px solid var(--p-rail-line);
+  margin-bottom: 2.6mm;
+}
+
+.p-side-section p {
+  font-size: 8pt;
+  line-height: 1.5;
+  color: var(--p-rail-soft);
+  margin-bottom: 1.2mm;
+  overflow-wrap: anywhere;
+}
+
+.p-side-section p strong {
+  color: var(--p-rail-text);
+  font-weight: 650;
+}
+
+.p-side-skill {
+  margin-bottom: 2.8mm;
+}
+
+.p-side-skill h3 {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 750;
+  font-size: 8.4pt;
+  color: var(--p-rail-text);
+  margin-bottom: 0.6mm;
+}
+
+/* --- main column -------------------------------------------------------- */
+
+.p-main {
+  padding: 13mm 13mm 12mm 10mm;
+}
+
+.p-header {
+  padding-bottom: 4mm;
+  border-bottom: 2.5px solid var(--p-ink);
+  margin-bottom: 5mm;
+}
+
+.p-header h1 {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 24pt;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.p-dot {
+  color: var(--p-accent);
+}
+
+.p-title {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 10.5pt;
+  color: var(--p-accent);
+  margin-top: 2mm;
+  letter-spacing: 0.02em;
+}
+
+/* --- sections ---------------------------------------------------------- */
+
+.p-section {
+  padding-top: 2mm;
+  margin-bottom: 4mm;
+}
+
+.p-section-title {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 10pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--p-accent);
+  padding-bottom: 1.4mm;
+  border-bottom: 1px solid var(--p-line);
+  margin-bottom: 3mm;
+  break-after: avoid;
+}
+
+.p-body {
+  padding-top: 1.2mm;
+  margin-bottom: 1mm;
+  color: var(--p-ink);
+  break-inside: avoid;
+}
+
+/* --- stats -------------------------------------------------------------- */
+
+.p-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.6mm;
+  margin-top: 3.2mm;
+  break-inside: avoid;
+}
+
+.p-stat {
+  border: 1px solid var(--p-line);
+  border-radius: 2.5mm;
+  padding: 2.4mm 2.6mm;
+  break-inside: avoid;
+}
+
+.p-stat-value {
+  display: block;
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 14pt;
+  color: var(--p-accent);
+  line-height: 1.1;
+}
+
+.p-stat-label {
+  display: block;
+  font-size: 7pt;
+  color: var(--p-soft);
+  margin-top: 0.8mm;
+  line-height: 1.35;
+}
+
+/* --- flagship ------------------------------------------------------------ */
+
+.p-flagship {
+  border-left: 3px solid var(--p-accent);
+  padding-left: 4.6mm;
+}
+
+.p-flagship-head {
+  break-after: avoid;
+}
+
+.p-flagship-head h3 {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 12.5pt;
+  letter-spacing: -0.01em;
+}
+
+.p-flagship-meta {
+  font-weight: 600;
+  font-size: 9pt;
+  color: var(--p-soft);
+  margin: 1mm 0 2.4mm;
+}
+
+.p-flagship h4 {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 9.6pt;
+  padding-top: 2.4mm;
+  margin: 0.4mm 0 1.3mm;
+  break-after: avoid;
+}
+
+/* --- lists ---------------------------------------------------------------- */
+
+.p-list {
+  list-style: none;
+  margin-bottom: 1.6mm;
+}
+
+.p-list li {
+  position: relative;
+  padding-left: 4.4mm;
+  padding-top: 0.6mm;
+  margin-bottom: 0.5mm;
+  break-inside: avoid;
+}
+
+.p-list li::before {
+  content: '';
+  position: absolute;
+  left: 0.6mm;
+  top: 2.5mm;
+  width: 1.6mm;
+  height: 1.6mm;
+  background: var(--p-accent);
+  transform: rotate(45deg);
+}
+
+.p-list-tight li {
+  margin-bottom: 0.3mm;
+}
+
+.p-tags {
+  font-size: 8pt;
+  font-weight: 600;
+  color: var(--p-soft);
+  margin-top: 1.4mm;
+}
+
+/* --- experience timeline ------------------------------------------------- */
+
+.p-xp {
+  position: relative;
+}
+
+.p-entry {
+  position: relative;
+  padding: 3.4mm 0 0 5.4mm;
+  border-left: 1.5px solid var(--p-line);
+  break-inside: avoid;
+}
+
+.p-entry::before {
+  content: '';
+  position: absolute;
+  left: -1.55mm;
+  top: 4.2mm;
+  width: 2.2mm;
+  height: 2.2mm;
+  border-radius: 50%;
+  background: var(--p-paper);
+  border: 0.9mm solid var(--p-accent);
+}
+
+.p-entry-years {
+  display: block;
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 8.2pt;
+  letter-spacing: 0.08em;
+  color: var(--p-accent);
+  margin-bottom: 0.8mm;
+}
+
+.p-entry h3 {
+  font-family: 'Manrope Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 11pt;
+  letter-spacing: -0.01em;
+}
+
+.p-entry-role {
+  font-weight: 600;
+  font-size: 9pt;
+  color: var(--p-soft);
+  margin: 0.5mm 0 1.7mm;
+}
+
+/* --- footer ----------------------------------------------------------------- */
+
+.p-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 6mm;
+  margin-top: 6mm;
+  padding-top: 2.6mm;
+  border-top: 1px solid var(--p-line);
+  font-size: 7.6pt;
+  color: var(--p-soft);
+}

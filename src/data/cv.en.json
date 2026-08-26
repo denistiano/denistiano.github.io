@@ -1,0 +1,230 @@
+{
+  "meta": {
+    "name": "Denis Iliev",
+    "title": "Software Architect & Technical Lead",
+    "location": "Plovdiv, Bulgaria",
+    "email": "denistiano@gmail.com",
+    "phone": "+359 898 513 566",
+    "linkedin": "",
+    "github": "",
+    "website": ""
+  },
+  "hero": {
+    "headline": ["TECHNICAL LEAD", "& SOFTWARE", "ARCHITECT"],
+    "subheadline": "I lead large-scale modernizations of systems others call impossible to migrate. Currently the Technical Lead and Main Architect of a 60+ engineer program rebuilding a 35-year-old core banking platform on a modern, AI-accelerated stack.",
+    "ctaExplore": "Explore my work",
+    "ctaDownload": "Download CV",
+    "scrollHint": "Scroll to step inside"
+  },
+  "about": {
+    "title": "The person behind the architecture",
+    "kicker": "About",
+    "paragraphs": [
+      "I am a software architect and technical lead from Plovdiv, Bulgaria, with over a decade of experience building and modernizing systems for clients ranging from five-person startups to global financial institutions. Most of my career has revolved around Java and the Spring ecosystem, but what defines my work is not a framework — it is the ability to take a system everyone is afraid to touch and turn it into something teams can move fast on.",
+      "I gravitate toward the hardest version of every problem: legacy platforms with decades of accumulated decisions, clients whose trust has been burned by failed attempts, and programs where the roadmap itself needs to be reinvented. That is where architecture stops being diagrams and becomes leadership.",
+      "My background in competitive sports — football and wrestling — shaped how I operate professionally: disciplined preparation, calm under pressure, and an instinct for making a team greater than the sum of its parts."
+    ],
+    "stats": [
+      { "value": "11+", "label": "Years of professional experience" },
+      { "value": "20+", "label": "Projects delivered end to end" },
+      { "value": "60+", "label": "Engineers under my technical direction" },
+      { "value": "10+", "label": "Clients — from startups to global enterprises" }
+    ]
+  },
+  "flagship": {
+    "kicker": "Flagship engagement",
+    "title": "Modernizing a 35-year-old core banking platform",
+    "client": "Finastra — LoanIQ",
+    "role": "Project Technical Lead & Main Architect",
+    "years": "Ongoing",
+    "summary": "A complete migration of one of the financial industry's most entrenched systems — a commercial lending platform with over 35 years of accumulated code — to a modern technology stack. Several companies had attempted it before and failed. This is the story of how the program was turned around.",
+    "challenge": {
+      "title": "The challenge",
+      "text": "The client arrived guarded and skeptical — previous vendors had promised the same migration and failed to deliver, and our continued engagement was far from guaranteed. The codebase carried more than three decades of business-critical logic that no single person fully understood. A conventional rewrite plan was never going to survive contact with reality, and the client knew it."
+    },
+    "approach": {
+      "title": "How I turned it around",
+      "bullets": [
+        "During discovery, I stood out as a key figure by building proof-of-concept AI automation tools that demonstrated — not promised — that the migration was achievable. Those POCs visibly shifted the client's attitude from skepticism to confidence.",
+        "I designed a new target architecture and an AI-driven automation roadmap that completely reshaped the program's original plan. That roadmap was adopted and made me the Project Technical Lead and Main Architect.",
+        "I architected the suite of migration automation tooling that is in place today, systematically converting the legacy codebase instead of relying on error-prone manual rewrites.",
+        "I defined how the program itself runs: pod structures, the way teams interact, client communication, planning, and milestone acceptance — from interviewing and staffing in the early days to steering every technical decision now."
+      ]
+    },
+    "impact": {
+      "title": "Where it stands",
+      "bullets": [
+        "The program is executing on my architecture and roadmap, with a team of more than 60 engineers working toward the complete migration of the platform.",
+        "I am the central point of technical direction — implementation questions, architectural decisions, and cross-team alignment all flow through me.",
+        "A client that once doubted the engagement would continue now treats the program as its path forward — trust rebuilt through working software, not slideware.",
+        "The AI automation approach avoids the pitfalls that sank previous attempts: instead of an army of developers manually re-reading 35 years of code, tooling does the heavy lifting while engineers verify, harden, and extend."
+      ]
+    },
+    "stack": ["Java", "Spring Boot", "AI migration tooling", "LLM-based automation", "Microservices", "Event-driven architecture", "CI/CD", "Cloud"]
+  },
+  "timelineSection": {
+    "kicker": "Career journey",
+    "title": "From first commit to program architect"
+  },
+  "timeline": [
+    {
+      "years": "2025 — Present",
+      "company": "Globant",
+      "role": "Project Technical Lead & Main Architect",
+      "location": "Plovdiv, Bulgaria",
+      "summary": "Following Globant's acquisition of Blankfactor, I continue to lead the Finastra LoanIQ modernization program — my architecture, my roadmap, executed by a 60+ engineer organization.",
+      "highlights": [
+        "Own the target architecture and the AI-driven migration roadmap for a 35-year-old core banking platform.",
+        "Direct technical decision-making across all pods; define team topology, planning, and milestone acceptance with the client.",
+        "Serve as the single point of alignment — engineers, leads, and client stakeholders route implementation and architecture questions through me."
+      ],
+      "tech": ["Java", "Spring", "AI tooling", "Architecture", "Technical leadership"],
+      "flagship": true
+    },
+    {
+      "years": "2023 — 2025",
+      "company": "Blankfactor",
+      "role": "Software Architect / Backend Lead",
+      "location": "Plovdiv, Bulgaria",
+      "summary": "Delivered backend systems for major players in the financial industry, then was selected as one of the backend leads for the Finastra migration program — where my discovery-phase AI POCs reshaped the entire engagement.",
+      "highlights": [
+        "Key figure in driving the implementation of products dealing with student loans and retirement for T. Rowe Price / FIS.",
+        "Selected as backend lead for the Finastra LoanIQ migration; built the AI automation POCs that won the client's confidence.",
+        "Proposed the architecture and roadmap that replaced the original migration plan and elevated me to Project Technical Lead."
+      ],
+      "tech": ["Java", "Spring Boot", "Financial services", "AI-assisted migration"]
+    },
+    {
+      "years": "2022 — 2023",
+      "company": "Accenture",
+      "role": "Software Architect",
+      "location": "Bulgaria",
+      "summary": "Architect within a team of 8–10 professionals, working closely with enterprise clients on solution design and delivery.",
+      "highlights": [
+        "Led research and architectural documentation; reviewed code and supported delivery teams.",
+        "Collaborated directly with clients and cross-functional teams, delivering technical presentations and guidance."
+      ],
+      "tech": ["Java", "Architecture", "Documentation", "Client consulting"]
+    },
+    {
+      "years": "2021 — 2022",
+      "company": "Effortel",
+      "role": "Software Developer",
+      "location": "Bulgaria",
+      "summary": "Backend development for a telecom (MVNO) platform provider, building and maintaining high-availability Java services.",
+      "highlights": [
+        "Developed and maintained core backend services in a telecom-grade environment."
+      ],
+      "tech": ["Java", "Spring", "SQL"]
+    },
+    {
+      "years": "2020 — 2021",
+      "company": "Independent / Freelance",
+      "role": "Full-cycle Engineer — Custom Warehouse ERP",
+      "location": "Plovdiv, Bulgaria",
+      "summary": "A one-man show: analyzed a client's entire business, then designed and built a custom ERP that automated most of their processes and eliminated duplicate data entry.",
+      "highlights": [
+        "Negotiated, analyzed, and personally built ~99% of the system — from data model to UI.",
+        "Order tracking, live stock availability, barcode scanning, complex formula-based pricing, and document/invoice printing.",
+        "Introduced a coherent data flow to a business that had been run on paper and spreadsheets."
+      ],
+      "tech": ["Java", "Spring Boot", "MySQL", "Web app", "Barcode integration"]
+    },
+    {
+      "years": "2019 — 2020",
+      "company": "Fimantic",
+      "role": "Software Developer — Banking Regulation",
+      "location": "Bulgaria",
+      "summary": "Early engineer at a 5–6 person RegTech startup that turned unstructured regulatory documents into structured compliance data for financial entities.",
+      "highlights": [
+        "Built the web crawler (crawler4j) that discovered applicable regulatory documents across target websites based on configurable criteria.",
+        "Built the parser that broke documents down into individually tagged, structured pieces.",
+        "Migrated the entire platform from JAX-RS to Spring Boot and introduced a relational database."
+      ],
+      "tech": ["Java", "Spring Boot", "crawler4j", "PostgreSQL", "Document parsing"]
+    },
+    {
+      "years": "2015 — 2019",
+      "company": "ScaleFocus",
+      "role": "Software Developer → Team Lead",
+      "location": "Bulgaria & USA (on-site)",
+      "summary": "Four years and 10+ projects for small and large-scale clients — the foundation of my engineering career, ending with leading and growing junior teams.",
+      "highlights": [
+        "Worked on-site in the USA for Kohl's (Milwaukee, WI) and Shutterfly (San Francisco, CA).",
+        "Taught Spring to students, interviewed candidates, and approved their hiring into the company.",
+        "Led a team of trainees and junior developers on client deliveries."
+      ],
+      "tech": ["Java", "Spring", "Enterprise clients", "Mentoring"]
+    }
+  ],
+  "skillsSection": {
+    "kicker": "Toolbox",
+    "title": "What I work with"
+  },
+  "skills": [
+    {
+      "category": "Architecture & Leadership",
+      "items": ["System design", "Migration strategy", "Technical roadmaps", "Team topology & pods", "Client communication", "Milestone planning", "Interviewing & mentoring"]
+    },
+    {
+      "category": "AI-Accelerated Engineering",
+      "items": ["LLM-based migration automation", "AI code transformation pipelines", "Agentic tooling design", "POC-driven validation"]
+    },
+    {
+      "category": "Backend",
+      "items": ["Java", "Spring Boot", "Spring Web / JPA / Security", "REST APIs", "Microservices", "Event-driven systems"]
+    },
+    {
+      "category": "Data",
+      "items": ["PostgreSQL", "MySQL", "Redis"]
+    },
+    {
+      "category": "Cloud & DevOps",
+      "items": ["AWS", "Azure", "Docker", "Linux (Arch)", "CI/CD", "Maven", "Gradle"]
+    },
+    {
+      "category": "Collaboration",
+      "items": ["Git", "JIRA", "Confluence", "Visio", "Technical documentation"]
+    }
+  ],
+  "education": [
+    {
+      "years": "2011 — 2015",
+      "institution": "American University in Bulgaria",
+      "degree": "B.Sc. Computer Science & Information Systems"
+    },
+    {
+      "years": "2006 — 2011",
+      "institution": "Math High School, Plovdiv",
+      "degree": "Programming & English"
+    }
+  ],
+  "certifications": ["Oracle Certified Professional, Java SE 8"],
+  "languages": [
+    { "name": "Bulgarian", "level": "Native" },
+    { "name": "English", "level": "Fluent" }
+  ],
+  "interests": "Football, wrestling, fitness — the discipline carries over.",
+  "contact": {
+    "title": "Get in touch",
+    "kicker": "Contact",
+    "text": "I'm open to conversations about software architecture, legacy modernization, and technical leadership. For recruiters and HR systems, the full CV is available as a PDF in English and Bulgarian.",
+    "emailLabel": "Email",
+    "locationLabel": "Based in",
+    "downloadLabel": "Download CV (PDF)"
+  },
+  "pdf": {
+    "cvTitle": "Curriculum Vitae",
+    "aboutTitle": "Profile",
+    "flagshipTitle": "Flagship Engagement",
+    "experienceTitle": "Professional Experience",
+    "skillsTitle": "Skills",
+    "educationTitle": "Education",
+    "certificationsTitle": "Certifications",
+    "languagesTitle": "Languages",
+    "contactTitle": "Contact",
+    "interestsTitle": "Interests",
+    "presentLabel": "Present",
+    "generatedNote": "An interactive version of this CV lives on the web — see the address above."
+  }
+}

@@ -1,49 +1,51 @@
----
-layout: default
-make-smaller-titles: true
----
-
-
-<div class="container-fluid index">
-    <div class="row">
-
-        <div class="col-md-12 main content-panel">
-
-            <div class="gravatar">
-                <img src="{{ site.title_image }}" class="img-circle about-image" height="150" width="150" alt="{{ site.title }}" />
-            </div>
-
-            <h1 class="header author-header" itemprop="headline">{{ site.title }}</h1>
-
-            <div class="author-text">
-                {{ site.title_description }}
-            </div>
-
-            {% include social_links.html %}
-          </div>
-          <div class="col-md-12 main content-panel">
-
-            <div class="articles">
-
-              <h2>Latest Articles</h2>
-
-              <ul>
-                  {% for post in site.posts limit: site.post_limit %}
-
-                      <li>
-                          <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-                          <small class="hidden-xs">{{ post.date | date: "%B %-d, %Y" }}</small>
-                      </li>
-
-                  {% endfor %}
-                  <li>
-                      <small><i><a href="{{ site.baseurl }}/posts/">more...</a></i></small>
-                  </li>
-              </ul>
-
-            </div>
-
-        </div>
-
-    </div>
-</div>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Denis Iliev — Software Architect & Technical Lead</title>
+    <meta
+      name="description"
+      content="Denis Iliev — Software Architect & Technical Lead from Plovdiv, Bulgaria. Leading large-scale modernizations of legacy systems, currently directing a 60+ engineer program migrating a 35-year-old core banking platform with AI-accelerated tooling."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Denis Iliev — Software Architect & Technical Lead" />
+    <meta
+      property="og:description"
+      content="I lead large-scale modernizations of systems others call impossible to migrate. Explore the interactive 3D CV or download the PDF."
+    />
+    <meta name="theme-color" content="#f1eee8" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23181b1e'/%3E%3Ctext x='32' y='42' font-family='sans-serif' font-weight='800' font-size='28' fill='%23f1eee8' text-anchor='middle'%3EDI%3C/text%3E%3Ccircle cx='50' cy='46' r='5' fill='%23d97b29'/%3E%3C/svg%3E" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Denis Iliev",
+        "jobTitle": "Software Architect & Technical Lead",
+        "email": "mailto:denistiano@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Plovdiv",
+          "addressCountry": "BG"
+        },
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "American University in Bulgaria"
+        },
+        "knowsAbout": [
+          "Software Architecture",
+          "Legacy System Migration",
+          "AI-Assisted Engineering",
+          "Java",
+          "Spring Boot",
+          "Technical Leadership"
+        ],
+        "knowsLanguage": ["Bulgarian", "English"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

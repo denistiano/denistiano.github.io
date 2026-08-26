@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "about": "About",
+    "journey": "Journey",
+    "caseStudy": "Flagship",
+    "skills": "Toolbox",
+    "contact": "Contact",
+    "downloadCV": "Download CV",
+    "downloadEN": "PDF — English",
+    "downloadBG": "PDF — Bulgarian"
+  },
+  "langToggle": "БГ",
+  "loading": "Setting up the desk…"
+}
