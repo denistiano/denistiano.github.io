@@ -49,7 +49,7 @@ export function Contact() {
       </div>
 
       <p className="contact-footer">
-        © {new Date().getFullYear()} {cv.meta.name} · React Three Fiber · GSAP · Lenis
+        © {new Date().getFullYear()} {cv.meta.name}
       </p>
     </section>
   )

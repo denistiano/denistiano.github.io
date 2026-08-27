@@ -11,6 +11,7 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [sectionsOpen, setSectionsOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
+  const downloadRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<string>('')
 
   useScrollFrame((s) => {
@@ -34,6 +35,22 @@ export function Navbar() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [sectionsOpen])
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const onPointerDown = (e: PointerEvent) => {
+      if (!downloadRef.current?.contains(e.target as Node)) setMenuOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
 
   const goTo = (id: SectionId) => {
     const el = sectionEls[id]
@@ -67,12 +84,14 @@ export function Navbar() {
           <span />
           <span />
         </button>
-        <div
-          className={`nav-download ${menuOpen ? 'open' : ''}`}
-          onMouseEnter={() => setMenuOpen(true)}
-          onMouseLeave={() => setMenuOpen(false)}
-        >
-          <button className="btn btn-small btn-primary nav-cv" onClick={() => setMenuOpen((v) => !v)}>
+        <div className={`nav-download ${menuOpen ? 'open' : ''}`} ref={downloadRef}>
+          <button
+            type="button"
+            className="btn btn-small btn-primary nav-cv"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
             <span className="nav-cv-full">{ui.nav.downloadCV}</span>
             <span className="nav-cv-short">CV</span>
             <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
@@ -80,10 +99,10 @@ export function Navbar() {
             </svg>
           </button>
           <div className="nav-download-menu" role="menu">
-            <a href={pdfHref('en')} download role="menuitem">
+            <a href={pdfHref('en')} download role="menuitem" onClick={() => setMenuOpen(false)}>
               {ui.nav.downloadEN}
             </a>
-            <a href={pdfHref('bg')} download role="menuitem">
+            <a href={pdfHref('bg')} download role="menuitem" onClick={() => setMenuOpen(false)}>
               {ui.nav.downloadBG}
             </a>
           </div>

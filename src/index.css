@@ -503,10 +503,10 @@ body.dark-world .btn-primary {
 .hero-headline {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(36px, 4.4vw, 64px);
-  line-height: 1.02;
+  font-size: clamp(32px, 4.2vw, 64px);
+  line-height: 1.05;
   letter-spacing: -0.03em;
-  margin-bottom: 26px;
+  margin-bottom: 16px;
 }
 
 .hero-line {
@@ -523,11 +523,11 @@ body.dark-world .btn-primary {
 }
 
 .hero-sub {
-  font-size: clamp(15px, 1.25vw, 17.5px);
-  line-height: 1.65;
+  font-size: clamp(15px, 1.25vw, 18px);
+  line-height: 1.5;
   color: var(--ink-soft);
-  max-width: 54ch;
-  margin-bottom: 34px;
+  max-width: 36ch;
+  margin-bottom: 28px;
 }
 
 .hero-ctas {
@@ -1419,19 +1419,28 @@ body.dark-world .journey {
 
 @media (max-width: 900px) {
   .hero {
-    align-items: flex-end;
+    justify-content: center;
+    padding: var(--nav-h) 20px 96px;
   }
 
   .hero-inner {
     width: 100%;
-    margin: 0 20px calc(14vh);
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    border-radius: 20px;
-    padding: 20px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .hero-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-ctas {
+    justify-content: center;
   }
 
   .hero-headline {
-    font-size: clamp(26px, 7.5vw, 42px);
+    font-size: clamp(18px, 5.6vw, 32px);
+    letter-spacing: -0.04em;
   }
 
   /* On phones the projected laptop screen would be a letterboxed
@@ -1444,6 +1453,14 @@ body.dark-world .journey {
     height: 100%;
     transform: none;
     border-radius: 0;
+  }
+
+  .screen-chrome {
+    display: none;
+  }
+
+  .frame-scroll {
+    top: 0;
   }
 
   .about-columns {

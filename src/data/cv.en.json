@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "Denis Iliev",
-    "title": "Software Architect & Technical Lead",
+    "title": "Technical Lead & Software Architect",
     "location": "Plovdiv, Bulgaria",
     "email": "denistiano@gmail.com",
     "phone": "+359 898 513 566",
@@ -10,8 +10,8 @@
     "website": ""
   },
   "hero": {
-    "headline": ["TECHNICAL LEAD", "& SOFTWARE", "ARCHITECT"],
-    "subheadline": "I lead large-scale modernizations of systems others call impossible to migrate. Currently the Technical Lead and Main Architect of a 60+ engineer program rebuilding a 35-year-old core banking platform on a modern, AI-accelerated stack.",
+    "headline": ["TECHNICAL LEAD", "& SOFTWARE ARCHITECT"],
+    "subheadline": "Architecture that teams can actually move on.",
     "ctaExplore": "Explore my work",
     "ctaDownload": "Download CV",
     "scrollHint": "Scroll to step inside"
