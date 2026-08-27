@@ -52,10 +52,40 @@ class ScrollEngine {
   private lastInput = 0
   /** Cinematic stays locked until the boot screen arms the engine. */
   private armed = false
+  private sceneLiveListeners = new Set<(live: boolean) => void>()
+
+  /** True after the cinematic lands and the visitor is reading the CV. */
+  isContent() {
+    return this.phase === 'content'
+  }
+
+  /**
+   * Phone content is a fullscreen DOM overlay — keep WebGL off so the
+   * GPU is not compositing a hidden desk behind it.
+   */
+  sceneLive() {
+    return this.phase !== 'content' || window.innerWidth >= 900
+  }
+
+  onSceneLive(cb: (live: boolean) => void) {
+    this.sceneLiveListeners.add(cb)
+    cb(this.sceneLive())
+    return () => {
+      this.sceneLiveListeners.delete(cb)
+    }
+  }
+
+  private syncScenePark() {
+    if (typeof document === 'undefined') return
+    const live = this.sceneLive()
+    document.documentElement.classList.toggle('scene-parked', !live)
+    for (const cb of this.sceneLiveListeners) cb(live)
+  }
 
   private onResize = () => {
     this.cinematicLength = sceneCfg.cinematicPages * window.innerHeight
-    invalidate()
+    this.syncScenePark()
+    if (this.sceneLive()) invalidate()
   }
 
   private onVisibility = () => {
@@ -107,6 +137,7 @@ class ScrollEngine {
       autoRaf: false,
       virtualScroll: this.onVirtualScroll,
     })
+    this.syncScenePark()
     this.loop()
   }
 
@@ -122,6 +153,7 @@ class ScrollEngine {
     this.afterPlay = null
     this.lastInput = 0
     this.armed = false
+    this.syncScenePark()
   }
 
   /** Allow the first cinematic once the scene has finished booting. */
@@ -169,6 +201,8 @@ class ScrollEngine {
     this.phase = 'playing'
     this.afterPlay = null
     this.lastInput = performance.now()
+    this.syncScenePark()
+    invalidate()
     lenis.scrollTo(0, {
       duration: sceneCfg.cinematicDuration,
       easing: easeInOutCubic,
@@ -177,6 +211,7 @@ class ScrollEngine {
       onComplete: () => {
         this.phase = 'intro'
         this.snapProgress()
+        this.syncScenePark()
         invalidate()
       },
     })
@@ -209,6 +244,7 @@ class ScrollEngine {
         lenis.scrollTo(0, { immediate: true })
         this.phase = 'intro'
         this.snapProgress()
+        this.syncScenePark()
         invalidate()
         return
       }
@@ -248,7 +284,8 @@ class ScrollEngine {
     this.phase = 'content'
     this.lastInput = performance.now()
     this.snapProgress()
-    invalidate()
+    this.syncScenePark()
+    if (this.sceneLive()) invalidate()
     const next = this.afterPlay
     this.afterPlay = null
     next?.()
@@ -309,7 +346,7 @@ class ScrollEngine {
       this.phase === 'playing' ||
       Math.abs(s.velocity) > 1e-4 ||
       Math.abs(s.progress - s.target) > 1e-4
-    if (moving) invalidate()
+    if (moving && this.sceneLive()) invalidate()
 
     this.loop()
   }

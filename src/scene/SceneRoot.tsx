@@ -110,6 +110,26 @@ function Warmup({ onReady }: { onReady: () => void }) {
   return null
 }
 
+/**
+ * On phones the CV is a fullscreen DOM overlay after the cinematic.
+ * Stop the demand loop and hide the canvas so the GPU is idle; bring
+ * it back the moment we reverse to the desk.
+ */
+function MobileScenePark() {
+  const set = useThree((s) => s.set)
+
+  useEffect(() => {
+    let live = true
+    return scrollEngine.onSceneLive((sceneLive) => {
+      if (!live) return
+      set({ frameloop: sceneLive ? 'demand' : 'never' })
+      if (sceneLive) invalidate()
+    })
+  }, [set])
+
+  return null
+}
+
 function DeskWorld({ quality }: { quality: QualitySettings }) {
   const shadow = quality.shadows
   return (
@@ -168,6 +188,7 @@ export function SceneRoot({
 
         <DeskWorld quality={quality} />
         <Warmup onReady={onReady} />
+        <MobileScenePark />
       </Canvas>
     </div>
   )

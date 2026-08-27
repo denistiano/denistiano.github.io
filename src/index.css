@@ -201,6 +201,11 @@ html.is-booting body {
   z-index: 0;
 }
 
+html.scene-parked .scene-canvas {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .scroll-spacer {
   position: relative;
   width: 1px;
@@ -1418,9 +1423,22 @@ body.dark-world .journey {
 }
 
 @media (max-width: 900px) {
+  .navbar {
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    -webkit-backdrop-filter: saturate(1.2) blur(16px);
+    backdrop-filter: saturate(1.2) blur(16px);
+    border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+
+  body.dark-world .navbar {
+    background: color-mix(in srgb, var(--bg-dark) 88%, transparent);
+    border-bottom-color: color-mix(in srgb, #fff 12%, transparent);
+  }
+
   .hero {
     justify-content: center;
-    padding: var(--nav-h) 20px 96px;
+    align-items: flex-start;
+    padding: calc(var(--nav-h) + 8px) 20px 96px;
   }
 
   .hero-inner {
@@ -1429,18 +1447,31 @@ body.dark-world .journey {
     text-align: center;
   }
 
+  .hero-kicker {
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
   .hero-sub {
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 14px;
+    font-size: 14px;
   }
 
   .hero-ctas {
     justify-content: center;
+    gap: 10px;
+  }
+
+  .hero-ctas .btn {
+    padding: 11px 20px;
   }
 
   .hero-headline {
     font-size: clamp(18px, 5.6vw, 32px);
     letter-spacing: -0.04em;
+    margin-bottom: 8px;
   }
 
   /* On phones the projected laptop screen would be a letterboxed
@@ -1461,6 +1492,10 @@ body.dark-world .journey {
 
   .frame-scroll {
     top: 0;
+  }
+
+  .cs:first-child {
+    padding-top: calc(var(--nav-h) + 28px);
   }
 
   .about-columns {

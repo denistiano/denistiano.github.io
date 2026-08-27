@@ -30,7 +30,7 @@ const HIGH: QualitySettings = {
 
 const MEDIUM: QualitySettings = {
   tier: 'medium',
-  dpr: [1, 1.25],
+  dpr: [1, 1.5],
   shadows: false,
   shadowMapSize: 512,
   antialias: false,
@@ -44,7 +44,10 @@ const MEDIUM: QualitySettings = {
 
 const LOW: QualitySettings = {
   tier: 'low',
-  dpr: [1, 1],
+  // 1× on a 2–3× phone looks like a mosaic. Cap at 2 so retina is
+  // readable without native-resolution fill (the scene also parks
+  // itself during mobile content, so this cost is only the landing).
+  dpr: [1, 2],
   shadows: false,
   shadowMapSize: 512,
   antialias: false,
@@ -78,7 +81,10 @@ export function detectQuality(): QualitySettings {
   const narrow = window.innerWidth < 900
   const coarse = window.matchMedia('(pointer: coarse)').matches
 
-  if (saveData || (mem !== undefined && mem <= 4) || cores <= 2 || (narrow && coarse)) {
+  if (saveData || cores <= 2 || (mem !== undefined && mem <= 2)) {
+    return { ...LOW, dpr: [1, 1.25] }
+  }
+  if ((mem !== undefined && mem <= 4) || (narrow && coarse)) {
     return LOW
   }
   if (narrow || cores <= 4 || (mem !== undefined && mem <= 8)) {
