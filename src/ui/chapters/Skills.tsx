@@ -22,6 +22,34 @@ export function Skills() {
           </div>
         ))}
       </div>
+      <div className="credential-grid">
+        <div className="credential-card rv">
+          <h3>{cv.pdf.educationTitle}</h3>
+          {cv.education.map((entry, i) => (
+            <p key={i}>
+              <strong>{entry.institution}</strong>
+              <br />
+              {entry.degree} · {entry.years}
+            </p>
+          ))}
+        </div>
+        <div className="credential-card rv">
+          <h3>{cv.pdf.certificationsTitle}</h3>
+          {cv.certifications.map((item, i) => (
+            <p key={i}>{item}</p>
+          ))}
+          <h3 className="credential-sub">{cv.pdf.languagesTitle}</h3>
+          {cv.languages.map((entry, i) => (
+            <p key={i}>
+              <strong>{entry.name}</strong> — {entry.level}
+            </p>
+          ))}
+        </div>
+        <div className="credential-card rv">
+          <h3>{cv.pdf.interestsTitle}</h3>
+          <p>{cv.interests}</p>
+        </div>
+      </div>
     </section>
   )
 }

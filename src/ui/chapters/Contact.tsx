@@ -1,6 +1,7 @@
 import { useLanguage } from '../../i18n/LanguageContext'
 import { registerSection } from '../sections'
 import { pdfHref } from '../pdf'
+import { cvPageHref } from '../../site'
 
 export function Contact() {
   const { cv, ui } = useLanguage()
@@ -39,11 +40,15 @@ export function Contact() {
         )}
       </div>
 
+      <p className="contact-read rv">
+        <a href={cvPageHref('en')}>{ui.nav.readEN}</a>
+        <a href={cvPageHref('bg')}>{ui.nav.readBG}</a>
+      </p>
       <div className="contact-downloads rv">
-        <a className="btn btn-primary" href={pdfHref('en')} download>
+        <a className="btn btn-primary" href={pdfHref('en')} type="application/pdf" download>
           {ui.nav.downloadEN}
         </a>
-        <a className="btn btn-ghost" href={pdfHref('bg')} download>
+        <a className="btn btn-ghost" href={pdfHref('bg')} type="application/pdf" download>
           {ui.nav.downloadBG}
         </a>
       </div>

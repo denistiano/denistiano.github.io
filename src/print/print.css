@@ -132,6 +132,11 @@ html.print-mode body {
   font-weight: 650;
 }
 
+.p-side-section a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .p-side-skill {
   margin-bottom: 2.8mm;
 }

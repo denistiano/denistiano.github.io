@@ -7,7 +7,10 @@
     "contact": "Контакт",
     "downloadCV": "Свали CV",
     "downloadEN": "PDF — Английски",
-    "downloadBG": "PDF — Български"
+    "downloadBG": "PDF — Български",
+    "readCV": "Прочети CV",
+    "readEN": "Онлайн — английски",
+    "readBG": "Онлайн — български"
   },
   "langToggle": "EN",
   "loading": "Подреждаме бюрото…",

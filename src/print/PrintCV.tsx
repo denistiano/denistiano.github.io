@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { Lang } from '../data/types'
 import { getCV } from '../i18n/LanguageContext'
 import avatar from '../assets/avatar.jpg'
@@ -13,6 +14,13 @@ import './print.css'
 export function PrintCV({ lang }: { lang: Lang }) {
   const cv = getCV(lang)
   const L = cv.pdf
+
+  useEffect(() => {
+    document.title = `${cv.meta.name} — ${L.cvTitle}`
+    document.documentElement.lang = lang
+    const robots = document.querySelector('meta[name="robots"]')
+    if (robots) robots.setAttribute('content', 'noindex, nofollow')
+  }, [L.cvTitle, cv.meta.name, lang])
 
   return (
     <div className="print-doc">
@@ -32,7 +40,11 @@ export function PrintCV({ lang }: { lang: Lang }) {
           <p>{cv.meta.phone}</p>
           <p>{cv.meta.location}</p>
           {cv.meta.linkedin && <p>{cv.meta.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</p>}
-          {cv.meta.website && <p>{cv.meta.website.replace(/^https?:\/\/(www\.)?/, '')}</p>}
+          {cv.meta.website && (
+            <p>
+              <a href={cv.meta.website}>{cv.meta.website.replace(/^https?:\/\/(www\.)?/, '')}</a>
+            </p>
+          )}
         </section>
 
         <section className="p-side-section">

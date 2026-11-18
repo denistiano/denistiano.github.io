@@ -5,6 +5,7 @@ import { scrollEngine } from '../scroll/engine'
 import { activeSectionCached } from './sectionCache'
 import { SECTION_NAV_KEYS, SECTION_ORDER, sectionEls, type SectionId } from './sections'
 import { pdfHref } from './pdf'
+import { cvPageHref } from '../site'
 
 export function Navbar() {
   const { ui, toggle } = useLanguage()
@@ -61,7 +62,7 @@ export function Navbar() {
 
   return (
     <nav className={`navbar${sectionsOpen ? ' is-open' : ''}`} ref={navRef}>
-      <button className="nav-logo" onClick={() => scrollEngine.flyTo(0)} aria-label="Back to start">
+      <button className="nav-logo" onClick={() => scrollEngine.flyTo(0)} aria-label="DI. Back to start">
         DI<span className="accent">.</span>
       </button>
 
@@ -99,15 +100,22 @@ export function Navbar() {
             </svg>
           </button>
           <div className="nav-download-menu" role="menu">
-            <a href={pdfHref('en')} download role="menuitem" onClick={() => setMenuOpen(false)}>
+            <a href={pdfHref('en')} type="application/pdf" download role="menuitem" onClick={() => setMenuOpen(false)}>
               {ui.nav.downloadEN}
             </a>
-            <a href={pdfHref('bg')} download role="menuitem" onClick={() => setMenuOpen(false)}>
+            <a href={pdfHref('bg')} type="application/pdf" download role="menuitem" onClick={() => setMenuOpen(false)}>
               {ui.nav.downloadBG}
+            </a>
+            <hr />
+            <a href={cvPageHref('en')} role="menuitem" onClick={() => setMenuOpen(false)}>
+              {ui.nav.readEN}
+            </a>
+            <a href={cvPageHref('bg')} role="menuitem" onClick={() => setMenuOpen(false)}>
+              {ui.nav.readBG}
             </a>
           </div>
         </div>
-        <button className="nav-lang" onClick={toggle} aria-label="Switch language">
+        <button className="nav-lang" onClick={toggle} aria-label={`${ui.langToggle}, switch language`}>
           {ui.langToggle}
         </button>
       </div>

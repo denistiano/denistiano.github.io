@@ -122,6 +122,9 @@ export interface UIStrings {
     downloadCV: string
     downloadEN: string
     downloadBG: string
+    readCV: string
+    readEN: string
+    readBG: string
   }
   langToggle: string
   loading: string

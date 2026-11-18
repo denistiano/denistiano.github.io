@@ -148,7 +148,7 @@ export function JourneyBar() {
         <button
           type="button"
           className="journey-esc"
-          aria-label="Back to start"
+          aria-label="esc, back to start"
           onClick={() => scrollEngine.flyTo(0)}
         >
           esc
@@ -159,7 +159,7 @@ export function JourneyBar() {
             type="button"
             data-chapter={id}
             className="journey-key"
-            aria-label={ui.nav[SECTION_NAV_KEYS[id]]}
+            aria-label={`${String(i + 1).padStart(2, '0')} ${ui.nav[SECTION_NAV_KEYS[id]]}`}
             onClick={() => goToSection(id)}
           >
             {String(i + 1).padStart(2, '0')}
