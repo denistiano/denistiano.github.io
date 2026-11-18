@@ -1,5 +1,6 @@
 import { useLanguage } from '../i18n/LanguageContext'
 import { pdfHref } from './pdf'
+import { cvPageHref } from '../site'
 
 /**
  * Served when the visitor prefers reduced motion: the complete story
@@ -15,11 +16,17 @@ export function StaticFallback() {
           DI<span className="accent">.</span>
         </span>
         <div className="static-header-actions">
-          <a className="btn btn-small btn-primary" href={pdfHref('en')} download>
+          <a className="btn btn-small btn-primary" href={pdfHref('en')} type="application/pdf" download>
             {ui.nav.downloadEN}
           </a>
-          <a className="btn btn-small btn-ghost" href={pdfHref('bg')} download>
+          <a className="btn btn-small btn-ghost" href={pdfHref('bg')} type="application/pdf" download>
             {ui.nav.downloadBG}
+          </a>
+          <a className="btn btn-small btn-ghost" href={cvPageHref('en')}>
+            {ui.nav.readEN}
+          </a>
+          <a className="btn btn-small btn-ghost" href={cvPageHref('bg')}>
+            {ui.nav.readBG}
           </a>
           <button className="nav-lang" onClick={toggle}>
             {ui.langToggle}
@@ -105,6 +112,31 @@ export function StaticFallback() {
               <strong>{g.category}:</strong> {g.items.join(', ')}
             </p>
           ))}
+        </section>
+
+        <section className="static-section">
+          <h2>{cv.pdf.educationTitle}</h2>
+          {cv.education.map((entry, i) => (
+            <p key={i}>
+              <strong>{entry.institution}</strong> — {entry.degree} · {entry.years}
+            </p>
+          ))}
+          <h3>{cv.pdf.certificationsTitle}</h3>
+          <ul>
+            {cv.certifications.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+          <h3>{cv.pdf.languagesTitle}</h3>
+          <ul>
+            {cv.languages.map((entry, i) => (
+              <li key={i}>
+                <strong>{entry.name}</strong> — {entry.level}
+              </li>
+            ))}
+          </ul>
+          <h3>{cv.pdf.interestsTitle}</h3>
+          <p>{cv.interests}</p>
         </section>
 
         <section className="static-section">

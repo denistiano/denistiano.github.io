@@ -7,7 +7,10 @@
     "contact": "Contact",
     "downloadCV": "Download CV",
     "downloadEN": "PDF — English",
-    "downloadBG": "PDF — Bulgarian"
+    "downloadBG": "PDF — Bulgarian",
+    "readCV": "Read the CV",
+    "readEN": "Read online — English",
+    "readBG": "Read online — Bulgarian"
   },
   "langToggle": "БГ",
   "loading": "Setting up the desk…",

@@ -396,7 +396,7 @@ html.scene-parked .scene-canvas {
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  min-width: 190px;
+  min-width: 230px;
   background: #fff;
   border-radius: 14px;
   padding: 6px;
@@ -428,6 +428,12 @@ html.scene-parked .scene-canvas {
 .nav-download-menu a:hover {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent-ink);
+}
+
+.nav-download-menu hr {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  margin: 4px 8px;
 }
 
 .nav-lang {
@@ -539,6 +545,16 @@ body.dark-world .btn-primary {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
+}
+
+.hero-read {
+  flex: 1 0 100%;
+  width: fit-content;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1200,6 +1216,43 @@ body.dark-world .journey {
   margin-bottom: 14px;
 }
 
+.credential-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.credential-card {
+  background: var(--card-dark);
+  border: 1px solid var(--line-dark);
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.credential-card h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15.5px;
+  margin-bottom: 12px;
+}
+
+.credential-card .credential-sub {
+  margin-top: 18px;
+}
+
+.credential-card p {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--text-soft-on-dark);
+  margin-bottom: 8px;
+}
+
+.credential-card strong {
+  color: var(--text-on-dark);
+  font-weight: 650;
+}
+
 /* --- Contact ---------------------------------------------------------- */
 
 .cs-contact {
@@ -1257,6 +1310,21 @@ body.dark-world .journey {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-soft-on-dark);
+}
+
+.contact-read {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: -12px 0 22px;
+  font-size: 14px;
+}
+
+.contact-read a {
+  color: var(--text-on-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .contact-downloads {

@@ -52,7 +52,7 @@ export function BootScreen({ ready, onGone }: { ready: boolean; onGone: () => vo
 
   return (
     <div className={`boot${leaving ? ' is-leaving' : ''}`} role="status" aria-live="polite" aria-busy={pct < 100}>
-      <button type="button" className="boot-lang" onClick={toggle} aria-label="Switch language">
+      <button type="button" className="boot-lang" onClick={toggle} aria-label={`${ui.langToggle}, switch language`}>
         {ui.langToggle}
       </button>
 

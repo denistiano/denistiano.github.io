@@ -4,6 +4,7 @@ import { useScrollFrame } from '../scroll/useScrollFrame'
 import { scrollEngine } from '../scroll/engine'
 import { BEATS, span, smoothstep } from '../scroll/choreography'
 import { pdfHref } from './pdf'
+import { cvPageHref } from '../site'
 
 /**
  * The landing text block. On scroll, each character dissolves —
@@ -11,7 +12,7 @@ import { pdfHref } from './pdf'
  * evaporates rather than slides away.
  */
 export function Hero() {
-  const { cv, lang } = useLanguage()
+  const { cv, ui, lang } = useLanguage()
   const rootRef = useRef<HTMLDivElement>(null)
   const charsRef = useRef<HTMLSpanElement[]>([])
   const subRef = useRef<HTMLParagraphElement>(null)
@@ -112,8 +113,11 @@ export function Hero() {
           >
             {cv.hero.ctaExplore}
           </button>
-          <a className="btn btn-ghost" href={pdfHref(lang)} download>
+          <a className="btn btn-ghost" href={pdfHref(lang)} type="application/pdf" download>
             {cv.hero.ctaDownload}
+          </a>
+          <a className="hero-read" href={cvPageHref(lang)}>
+            {ui.nav.readCV}
           </a>
         </div>
       </div>

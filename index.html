@@ -3,20 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Denis Iliev — Technical Lead & Software Architect</title>
+    <!-- SEO:HEAD -->
+    <title>Denis Iliev — Technical Lead &amp; Software Architect</title>
     <meta
       name="description"
-      content="Denis Iliev — Technical Lead & Software Architect from Plovdiv, Bulgaria. Architecture that teams can actually move on."
+      content="Technical lead and software architect in Plovdiv, Bulgaria. Denis Iliev modernizes legacy platforms with Java, Spring, and AI. CV in English and Bulgarian."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Denis Iliev — Technical Lead & Software Architect" />
-    <meta
-      property="og:description"
-      content="I lead large-scale modernizations of systems others call impossible to migrate. Explore the interactive 3D CV or download the PDF."
-    />
-    <meta name="theme-color" content="#f1eee8" />
+    <!-- /SEO:HEAD -->
+    <script>
+      document.documentElement.classList.add('js')
+      if (new URLSearchParams(location.search).has('print')) {
+        var robots = document.querySelector('meta[name="robots"]')
+        if (robots) robots.setAttribute('content', 'noindex, nofollow')
+      }
+    </script>
     <style>
       #boot-static {
+        display: none;
+      }
+      html.js #boot-static {
         position: fixed;
         inset: 0;
         z-index: 90;
@@ -26,6 +31,9 @@
         background: #f1eee8;
         color: #181b1e;
         font-family: system-ui, sans-serif;
+      }
+      html.js #cv-static {
+        display: none !important;
       }
       .boot-static-card {
         width: min(520px, calc(100% - 48px));
@@ -45,42 +53,16 @@
         color: #d97b29;
       }
     </style>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23181b1e'/%3E%3Ctext x='32' y='42' font-family='sans-serif' font-weight='800' font-size='28' fill='%23f1eee8' text-anchor='middle'%3EDI%3C/text%3E%3Ccircle cx='50' cy='46' r='5' fill='%23d97b29'/%3E%3C/svg%3E" />
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Denis Iliev",
-        "jobTitle": "Technical Lead & Software Architect",
-        "email": "mailto:denistiano@gmail.com",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Plovdiv",
-          "addressCountry": "BG"
-        },
-        "alumniOf": {
-          "@type": "CollegeOrUniversity",
-          "name": "American University in Bulgaria"
-        },
-        "knowsAbout": [
-          "Software Architecture",
-          "Legacy System Migration",
-          "AI-Assisted Engineering",
-          "Java",
-          "Spring Boot",
-          "Technical Leadership"
-        ],
-        "knowsLanguage": ["Bulgarian", "English"]
-      }
-    </script>
   </head>
   <body>
     <div id="boot-static">
       <div class="boot-static-card">
         <p class="boot-static-logo">DI<span>.</span></p>
-        <p class="boot-static-copy">Setting up the desk…</p>
+        <p class="boot-static-copy"><!-- SEO:BOOT -->Setting up the desk…<!-- /SEO:BOOT --></p>
       </div>
     </div>
+    <!-- SEO:BODY -->
+    <!-- /SEO:BODY -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
